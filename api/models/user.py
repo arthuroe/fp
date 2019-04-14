@@ -1,6 +1,3 @@
-from datetime import datetime, timedelta
-
-from api import app
 from api.models import db, ModelMixin
 
 

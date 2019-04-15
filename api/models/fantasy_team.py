@@ -11,3 +11,5 @@ class FantasyTeam(ModelMixin):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     points = db.Column(db.Integer)
     money = db.Column(db.Integer)
+    season_id = db.Column(db.Integer, db.ForeignKey(
+        'seasons.id'), nullable=False)

@@ -1,4 +1,5 @@
 from .base_model import ModelMixin, db
-from .user import User
-from .team import Team
+from .fantasy_team import FantasyTeam
 from .players import Player
+from .team import Team
+from .user import User

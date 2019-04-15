@@ -1,0 +1,15 @@
+from datetime import datetime
+
+from api.models import db, ModelMixin
+
+
+class Season(ModelMixin):
+    """
+    Season model attributes
+    """
+    __tablename__ = 'seasons'
+
+    logo = db.Column(db.String(180))
+    start_date = db.Column(db.DateTime, nullable=False)
+    end_date = db.Column(db.DateTime, nullable=False)
+    teams = db.relationship("Teams", backref="seasons", lazy="dynamic")

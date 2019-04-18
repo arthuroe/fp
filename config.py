@@ -26,7 +26,7 @@ class DevelopmentConfiguration(Config):
 class TestingConfiguration(Config):
     """Testing configuration class."""
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///test_db'
+    SQLALCHEMY_DATABASE_URI = os.environ.get("TEST_DATABASE_URL")
 
 
 class ProductionConfiguration(Config):

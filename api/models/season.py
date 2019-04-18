@@ -12,4 +12,4 @@ class Season(ModelMixin):
     logo = db.Column(db.String(180))
     start_date = db.Column(db.DateTime, nullable=False)
     end_date = db.Column(db.DateTime, nullable=False)
-    teams = db.relationship("Teams", backref="seasons", lazy="dynamic")
+    teams = db.relationship("Team", backref="seasons", lazy="dynamic")

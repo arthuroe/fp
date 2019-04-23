@@ -15,10 +15,12 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 
 from api.models import db
 from api.auth import auth_blueprint
+from api.teams import teams_blueprint
 
 db.init_app(app)
 
 app.register_blueprint(auth_blueprint)
+app.register_blueprint(teams_blueprint)
 
 
 @app.route('/')

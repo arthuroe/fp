@@ -13,11 +13,13 @@ app.config.from_object(app_configuration[environment])
 from api.models import db
 from api.auth import auth_blueprint
 from api.teams import teams_blueprint
+from api.seasons import seasons_blueprint
 
 db.init_app(app)
 
 app.register_blueprint(auth_blueprint)
 app.register_blueprint(teams_blueprint)
+app.register_blueprint(seasons_blueprint)
 
 
 @app.route('/')

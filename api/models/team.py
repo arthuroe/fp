@@ -13,4 +13,7 @@ class Team(ModelMixin):
     manager = db.Column(db.String(180))
     season_id = db.Column(db.Integer, db.ForeignKey(
         'seasons.id'), nullable=False)
-    players = db.relationship("Player", backref="team", lazy="dynamic")
+    players = db.relationship(
+        "Player", backref="team", lazy="dynamic")
+    season = db.relationship(
+        "Season", secondary="season_teams", lazy="dynamic")

@@ -15,6 +15,8 @@ This application enables users to create fantasy rugby teams and leagues. Users 
   - To install the virtual environment wrapper `mkvirtualenv` you can follow [this](https://jamie.curle.io/installing-pip-virtualenv-and-virtualenvwrapper-on-os-x).
   - `$ mkvirtualenv --py=python3 fp`
 
+- Copy `.env.sample` into `.env` in the fp which is the base folder of the project. You should adjust it according to your own local settings.
+
 - Setup postgresql database
 
   - `$ create a database`
@@ -28,9 +30,7 @@ This application enables users to create fantasy rugby teams and leagues. Users 
 
 - Install the project's requirements
 
-  - `$ pip install requiremenst.txt`
-
-- Copy `.env.sample` into `.env` in the fp which is the base folder of the project. You should adjust it according to your own local settings.
+  - `$ pip install requirements.txt`
 
 - Export the environment variables in the .env
 

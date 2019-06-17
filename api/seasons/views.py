@@ -1,6 +1,6 @@
 import logging
 
-from flask import Blueprint, request, make_response, jsonify
+from flask import request, make_response, jsonify
 from flask.views import MethodView
 
 from api.decorators import token_required, admin_required
@@ -35,3 +35,44 @@ class SeasonsView(MethodView):
             'teams': [season.serialize() for season in seasons]
         }
         return make_response(jsonify(response)), 200
+
+    def post(self):
+        post_data = request.json
+        logo = post_data.get('logo')
+        name = post_data.get('name')
+        start_date = post_data.get('start_date')
+        end_date = post_data.get('end_date')
+
+        if not all([name, start_date, end_date]):
+            response = {
+                'status': 'fail',
+                'message': 'Incomplete data. All fields are required'
+            }
+            return make_response(jsonify(response)), 400
+
+        try:
+            if Season.filter_by(start_date=start_date, end_date=end_date).all():
+                return make_response(
+                    jsonify(
+                        {
+                            'status': 'fail',
+                            'message': 'Season already created'
+                        }
+                    ), 409
+                )
+
+            season = Season(name=name, start_date=start_date,
+                            end_date=end_date, logo=logo)
+            season.save()
+            response = {
+                'status': 'success',
+                'message': f'Successfully added {name}'
+            }
+            return make_response(jsonify(response)), 201
+        except Exception as e:
+            logging.error(f"An error has occurred  {e}")
+            response = {
+                'status': 'fail',
+                'message': 'Failed to add season.'
+            }
+            return make_response(jsonify(response)), 400

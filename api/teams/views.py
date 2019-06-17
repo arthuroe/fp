@@ -16,6 +16,7 @@ class TeamsView(MethodView):
         post_data = request.json
         name = post_data.get('name')
         manager = post_data.get('manager')
+        logo = post_data.get("logo")
 
         if not all([name, manager]):
             response = {
@@ -25,7 +26,7 @@ class TeamsView(MethodView):
             return make_response(jsonify(response)), 400
 
         try:
-            team = Team(name=name, manager=manager)
+            team = Team(name=name, manager=manager, logo=logo)
             team.save()
             response = {
                 'status': 'success',
@@ -36,14 +37,12 @@ class TeamsView(MethodView):
             logging.error(f"An error has occurred  {e}")
             response = {
                 'status': 'fail',
-                'message': 'Failed to add flight.'
+                'message': 'Failed to add team.'
             }
             return make_response(jsonify(response)), 400
 
     def get(self):
         teams = Team.fetch_all()
-        import pdb
-        pdb.set_trace()
         if not teams:
             response = {
                 'status': 'success',

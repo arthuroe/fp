@@ -10,6 +10,7 @@ class Season(ModelMixin):
     __tablename__ = 'seasons'
 
     logo = db.Column(db.String(180))
+    name = db.Column(db.String(180))
     start_date = db.Column(db.DateTime, nullable=False)
     end_date = db.Column(db.DateTime, nullable=False)
     teams = db.relationship("Team", backref="teams",

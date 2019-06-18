@@ -55,3 +55,54 @@ class TeamsView(MethodView):
             'teams': [team.serialize() for team in teams]
         }
         return make_response(jsonify(response)), 200
+
+    def put(self, team_id):
+        try:
+            kwargs = request.json
+            kwargs.update({"id": team_id})
+            team = Team.find_first(id=team_id)
+
+            if team:
+                team.update(**kwargs)
+                response = {
+                    'status': 'Success',
+                    'message': 'Updated team'
+                }
+                return make_response(jsonify(response)), 200
+
+            response = {
+                'status': 'Fail',
+                'message': 'Team does not exist'
+            }
+            return make_response(jsonify(response)), 400
+        except Exception as e:
+            logging.error(f"An error has occurred  {e}")
+            response = {
+                'status': 'fail',
+                'message': 'Failed to update team.'
+            }
+            return make_response(jsonify(response)), 400
+
+    def delete(self, team_id):
+        try:
+            team = Team.find_first(id=team_id)
+            if team:
+                team.delete()
+                response = {
+                    'status': 'Success',
+                    'message': 'Deleted Team'
+                }
+                return make_response(jsonify(response)), 200
+
+            response = {
+                'status': 'Fail',
+                'message': 'Team does not exist'
+            }
+            return make_response(jsonify(response)), 400
+        except Exception as e:
+            logging.error(f"An error has occurred  {e}")
+            response = {
+                'status': 'fail',
+                'message': 'Failed to delete team.'
+            }
+            return make_response(jsonify(response)), 400

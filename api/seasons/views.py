@@ -13,20 +13,25 @@ class SeasonsView(MethodView):
     """
 
     def get(self, season_id=None):
+        if season_id:
+            season = Season.find_first(id=season_id)
+            if not season:
+                response = {
+                    'status': 'fail',
+                    'message': 'Season does not exist'
+                }
+                return make_response(jsonify(response)), 400
+            response = {
+                'status': 'success',
+                'teams': season.serialize()
+            }
+            return make_response(jsonify(response)), 200
+
         seasons = Season.fetch_all()
         if not seasons:
             response = {
                 'status': 'success',
                 'message': 'No seasons have been added'
-
-            }
-            return make_response(jsonify(response)), 200
-
-        if season_id:
-            seasons = Season.find_first(id=season_id)
-            response = {
-                'status': 'success',
-                'teams': [season.serialize() for season in seasons]
             }
             return make_response(jsonify(response)), 200
 

@@ -9,5 +9,5 @@ seasons_blueprint.add_url_rule(
 )
 seasons_blueprint.add_url_rule(
     '/seasons/<season_id>',
-    view_func=season_view, methods=['PUT', 'DELETE']
+    view_func=season_view, methods=['GET', 'PUT', 'DELETE']
 )

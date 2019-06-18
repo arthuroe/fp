@@ -76,3 +76,55 @@ class SeasonsView(MethodView):
                 'message': 'Failed to add season.'
             }
             return make_response(jsonify(response)), 400
+
+    def put(self, season_id):
+        try:
+            kwargs = request.json
+            kwargs.update({"id": season_id})
+            season = Season.find_first(id=season_id)
+
+            if season:
+                season.update(**kwargs)
+                response = {
+                    'status': 'Success',
+                    'message': 'Updated season'
+                }
+                return make_response(jsonify(response)), 200
+
+            response = {
+                'status': 'Fail',
+                'message': 'Season does not exist'
+            }
+            return make_response(jsonify(response)), 400
+        except Exception as e:
+            logging.error(f"An error has occurred  {e}")
+            response = {
+                'status': 'fail',
+                'message': 'Failed to update season.'
+            }
+            return make_response(jsonify(response)), 400
+
+    def delete(self, season_id):
+        try:
+
+            season = Season.find_first(id=season_id)
+            if season:
+                season.delete()
+                response = {
+                    'status': 'Success',
+                    'message': 'Deleted season'
+                }
+                return make_response(jsonify(response)), 200
+
+            response = {
+                'status': 'Fail',
+                'message': 'Season does not exist'
+            }
+            return make_response(jsonify(response)), 400
+        except Exception as e:
+            logging.error(f"An error has occurred  {e}")
+            response = {
+                'status': 'fail',
+                'message': 'Failed to delete season.'
+            }
+            return make_response(jsonify(response)), 400

@@ -62,3 +62,34 @@ class ModelMixin(db.Model):
     def filter(cls, *args):
         """Query and filter the data of the model."""
         return cls.query.filter(*args)
+
+    def delete(self):
+        """Delete an instance of the model from the database."""
+        try:
+            db.session.delete(self)
+            db.session.commit()
+            return True
+        except SQLAlchemyError:
+            db.session.rollback()
+            return False
+
+    def update(cls, **kwargs):
+        """Update/merge an instance of the model."""
+        try:
+            if 'id' not in kwargs:
+                return False
+
+            _id = kwargs['id']
+
+            record = cls.query.filter_by(id=_id).first()
+
+            if record is None:
+                return False
+
+            for key, value in kwargs.items():
+                setattr(record, key, value)
+            db.session.commit()
+            return True
+        except SQLAlchemyError:
+            db.session.rollback()
+            return False

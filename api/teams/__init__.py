@@ -8,5 +8,5 @@ teams_blueprint.add_url_rule(
     '/teams', view_func=teams_view, methods=['GET', 'POST']
 )
 teams_blueprint.add_url_rule(
-    '/teams/<team_id>', view_func=teams_view, methods=['PUT', 'DELETE']
+    '/teams/<team_id>', view_func=teams_view, methods=['GET', 'PUT', 'DELETE']
 )

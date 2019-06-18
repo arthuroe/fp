@@ -41,15 +41,29 @@ class TeamsView(MethodView):
             }
             return make_response(jsonify(response)), 400
 
-    def get(self):
+    def get(self, team_id=None):
+        if team_id:
+            team = Team.find_first(id=team_id)
+            if not team:
+                response = {
+                    'status': 'fail',
+                    'message': 'Team does not exist'
+                }
+                return make_response(jsonify(response)), 400
+            response = {
+                'status': 'success',
+                'team': team.serialize()
+            }
+            return make_response(jsonify(response)), 200
+
         teams = Team.fetch_all()
         if not teams:
             response = {
                 'status': 'success',
                 'message': 'No teams have been added'
-
             }
             return make_response(jsonify(response)), 200
+
         response = {
             'status': 'success',
             'teams': [team.serialize() for team in teams]

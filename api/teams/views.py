@@ -4,7 +4,7 @@ from flask import Blueprint, request, make_response, jsonify
 from flask.views import MethodView
 
 from api.decorators import token_required, admin_required
-from api.models import Team
+from api.models import Season, Team
 
 
 class TeamsView(MethodView):
@@ -17,6 +17,7 @@ class TeamsView(MethodView):
         name = post_data.get('name')
         manager = post_data.get('manager')
         logo = post_data.get("logo")
+        season_id = post_data.get('season_id')
 
         if not all([name, manager]):
             response = {
@@ -26,7 +27,10 @@ class TeamsView(MethodView):
             return make_response(jsonify(response)), 400
 
         try:
+            season = Season.find_first(id=season_id)
             team = Team(name=name, manager=manager, logo=logo)
+            season.teams.append(team)
+            season.save()
             team.save()
             response = {
                 'status': 'success',

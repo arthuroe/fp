@@ -4,12 +4,12 @@ from flask import request, make_response, jsonify
 from flask.views import MethodView
 
 from api.decorators import token_required, admin_required
-from api.models import FantasyTeam
+from api.models import FantasyTeam, Player
 
 
 class FantasyTeamView(MethodView):
     """
-    View to Fantasy Teams
+    View to handle Fantasy Teams
     """
     decorators = [token_required]
 
@@ -69,5 +69,66 @@ class FantasyTeamView(MethodView):
             response = {
                 'status': 'fail',
                 'message': 'Failed to add fantasy_team.'
+            }
+            return make_response(jsonify(response)), 400
+
+
+class PlayerFantasyTeamView(MethodView):
+    """
+    View to handle Fantasy Team Players
+    """
+    decorators = [token_required]
+
+    def get(self, current_user, fantasy_team_id):
+        fantasy_team = FantasyTeam.find_first(id=fantasy_team_id)
+        players = fantasy_team.players
+
+        if not players:
+            response = {
+                'status': 'success',
+                'mesage': 'No players have been added'
+            }
+            return make_response(jsonify(response)), 200
+
+        response = {
+            'status': 'success',
+            'players': [player.serialize() for player in players]
+        }
+        return make_response(jsonify(response)), 200
+
+    def post(self, current_user, fantasy_team_id):
+        player_id = request.json.get('player_id')
+
+        try:
+            fantasy_team = FantasyTeam.find_first(id=fantasy_team_id)
+            player = Player.find_first(id=player_id)
+
+            if player in fantasy_team.players:
+                response = {
+                    'status': 'fail',
+                    'message': 'Player already added.'
+                }
+                return make_response(jsonify(response)), 400
+
+            if len(fantasy_team.players) >= 2:
+                response = {
+                    'status': 'fail',
+                    'message': 'Player limit reached.'
+                }
+                return make_response(jsonify(response)), 400
+
+            fantasy_team.players.append(player)
+            fantasy_team.save()
+            response = {
+                'status': 'success',
+                'message': f'Successfully added {player.name}'
+            }
+            return make_response(jsonify(response)), 201
+
+        except Exception as e:
+            logging.error(f"An error has occurred  {e}")
+            response = {
+                'status': 'fail',
+                'message': 'Failed to add player.'
             }
             return make_response(jsonify(response)), 400

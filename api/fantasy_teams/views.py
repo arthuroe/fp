@@ -3,6 +3,7 @@ import logging
 from flask import request, make_response, jsonify
 from flask.views import MethodView
 
+from .helpers import check_max_players_from_team
 from api.decorators import token_required, admin_required
 from api.models import FantasyTeam, Player
 
@@ -109,6 +110,8 @@ class PlayerFantasyTeamView(MethodView):
                     'message': 'Player already added.'
                 }
                 return make_response(jsonify(response)), 400
+            players = fantasy_team.players
+            check_max_players_from_team(player, players)
 
             if len(fantasy_team.players) >= 2:
                 response = {

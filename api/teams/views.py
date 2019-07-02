@@ -19,7 +19,7 @@ class TeamsView(MethodView):
         logo = post_data.get("logo")
         season_id = post_data.get('season_id')
 
-        if not all([name, manager]):
+        if not all([name, manager, season_id]):
             response = {
                 'status': 'fail',
                 'message': ('Incomplete data. All fields are required')

@@ -4,7 +4,7 @@ from flask import request, make_response, jsonify
 from flask.views import MethodView
 
 from api.decorators import token_required
-from api.models import FantasyLeague
+from api.models import FantasyLeague, FantasyTeam
 
 
 class FantasyLeagueView(MethodView):
@@ -29,7 +29,7 @@ class FantasyLeagueView(MethodView):
         if not leagues:
             response = {
                 'status': 'success',
-                'message': 'No teams have been added'
+                'message': 'No leagues have been added'
             }
             return make_response(jsonify(response)), 200
 
@@ -63,5 +63,49 @@ class FantasyLeagueView(MethodView):
             response = {
                 'status': 'fail',
                 'message': 'Failed to add league.'
+            }
+            return make_response(jsonify(response)), 400
+
+
+class FantasyLeagueUsersView(MethodView):
+
+    def get(self):
+        pass
+
+    def post(self):
+        fantasy_team_id = request.json.get('fantasy_team_id')
+        fantasy_league_id = request.json.get('fantasy_league_id')
+
+        try:
+            fantasy_league = FantasyLeague.find_first(id=fantasy_league_id)
+            fantasy_team = FantasyTeam.find_first(id=fantasy_team_id)
+
+            if not fantasy_team or not fantasy_league:
+                response = {
+                    'status': 'fail',
+                    'message': 'Team or league does not exist.'
+                }
+                return make_response(jsonify(response)), 400
+
+            if fantasy_team in fantasy_team.players:
+                response = {
+                    'status': 'fail',
+                    'message': 'Team already added to league.'
+                }
+                return make_response(jsonify(response)), 400
+
+            fantasy_league.fantasy_teams.append(fantasy_team)
+            fantasy_league.save()
+            response = {
+                    'status': 'Success',
+                    'message': 'Team already added to league.'
+                }
+            return make_response(jsonify(response)), 400
+
+        except Exception as e:
+            logging.error(f"An error has occurred  {e}")
+            response = {
+                'status': 'Success',
+                'message': f'Successfully added {fantasy_team.name} to {fantasy_league.name}.'
             }
             return make_response(jsonify(response)), 400

@@ -69,8 +69,22 @@ class FantasyLeagueView(MethodView):
 
 class FantasyLeagueUsersView(MethodView):
 
-    def get(self):
-        pass
+    def get(self, fantasy_league_id):
+        league = FantasyLeague.find_first(id=fantasy_league_id)
+        if not league:
+            response = {
+                'status': 'fail',
+                'message': 'League does not exist'
+            }
+            return make_response(jsonify(response)), 400
+
+        league_teams = league.fantasy_teams
+
+        response = {
+            'status': 'success',
+            'league teams': [team.serialize() for team in league_teams]
+        }
+        return make_response(jsonify(response)), 200
 
     def post(self):
         fantasy_team_id = request.json.get('fantasy_team_id')
@@ -97,15 +111,16 @@ class FantasyLeagueUsersView(MethodView):
             fantasy_league.fantasy_teams.append(fantasy_team)
             fantasy_league.save()
             response = {
-                    'status': 'Success',
-                    'message': 'Team already added to league.'
-                }
-            return make_response(jsonify(response)), 400
+                'status': 'Success',
+                'message': 'Team already added to league.'
+            }
+            return make_response(jsonify(response)), 200
 
         except Exception as e:
             logging.error(f"An error has occurred  {e}")
             response = {
                 'status': 'Success',
-                'message': f'Successfully added {fantasy_team.name} to {fantasy_league.name}.'
+                'message': (f'Successfully added {fantasy_team.name}'
+                            f' to {fantasy_league.name}.')
             }
             return make_response(jsonify(response)), 400

@@ -12,7 +12,12 @@ fantasy_league_blueprint.add_url_rule(
 fantasy_league_user_view = FantasyLeagueUsersView.as_view(
     'fantasy_leagues_users_api')
 fantasy_league_blueprint.add_url_rule(
-    '/join_fantasy_league', view_func=fantasy_league_user_view, methods=['POST']
+    '/join_fantasy_league', view_func=fantasy_league_user_view,
+    methods=['POST']
+)
+fantasy_league_blueprint.add_url_rule(
+    '/leave_fantasy_league', view_func=fantasy_league_user_view,
+    methods=['DELETE']
 )
 fantasy_league_blueprint.add_url_rule(
     '/view_fantasy_league/<fantasy_league_id>',

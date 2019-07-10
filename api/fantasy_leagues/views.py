@@ -101,7 +101,7 @@ class FantasyLeagueUsersView(MethodView):
                 }
                 return make_response(jsonify(response)), 400
 
-            if fantasy_team in fantasy_team.players:
+            if fantasy_team in fantasy_league.fantasy_teams:
                 response = {
                     'status': 'fail',
                     'message': 'Team already added to league.'
@@ -112,15 +112,54 @@ class FantasyLeagueUsersView(MethodView):
             fantasy_league.save()
             response = {
                 'status': 'Success',
-                'message': 'Team already added to league.'
+                'message': (f'Successfully added {fantasy_team.name}'
+                            f' to {fantasy_league.name}.')
             }
             return make_response(jsonify(response)), 200
 
         except Exception as e:
             logging.error(f"An error has occurred  {e}")
             response = {
+                'status': 'fail',
+                'message': f'Error adding team to league.'
+            }
+            return make_response(jsonify(response)), 400
+
+    def delete(self):
+        fantasy_team_id = request.json.get('fantasy_team_id')
+        fantasy_league_id = request.json.get('fantasy_league_id')
+
+        try:
+            fantasy_league = FantasyLeague.find_first(id=fantasy_league_id)
+            fantasy_team = FantasyTeam.find_first(id=fantasy_team_id)
+
+            if not fantasy_team or not fantasy_league:
+                response = {
+                    'status': 'fail',
+                    'message': 'Team or league does not exist.'
+                }
+                return make_response(jsonify(response)), 400
+
+            if fantasy_team not in fantasy_league.fantasy_teams:
+                response = {
+                    'status': 'fail',
+                    'message': 'Team already not in league.'
+                }
+                return make_response(jsonify(response)), 400
+
+            fantasy_league.fantasy_teams.remove(fantasy_team)
+            fantasy_league.save()
+            response = {
                 'status': 'Success',
-                'message': (f'Successfully added {fantasy_team.name}'
-                            f' to {fantasy_league.name}.')
+                'message': (f'{fantasy_team.name} removed from'
+                            f' {fantasy_league.name}.')
+            }
+            return make_response(jsonify(response)), 200
+
+        except Exception as e:
+            logging.error(f"An error has occurred  {e}")
+            response = {
+                'status': 'fail',
+                'message': f'Error removing team from league.'
             }
             return make_response(jsonify(response)), 400

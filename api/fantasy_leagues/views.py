@@ -4,7 +4,7 @@ from flask import request, make_response, jsonify
 from flask.views import MethodView
 
 from api.decorators import token_required
-from api.models import FantasyLeague, FantasyTeam
+from api.models import FantasyLeague, FantasyTeam, FantasyLeagueTeam
 
 
 class FantasyLeagueView(MethodView):
@@ -78,7 +78,9 @@ class FantasyLeagueUsersView(MethodView):
             }
             return make_response(jsonify(response)), 400
 
-        league_teams = league.fantasy_teams
+        league_teams = FantasyLeagueTeam.filter_by(
+            fantasyleague_id=fantasy_league_id).order_by(
+                FantasyLeagueTeam.points.desc())
 
         response = {
             'status': 'success',

@@ -9,6 +9,7 @@ from api.models import FantasyLeague, FantasyTeam, FantasyLeagueTeam
 
 class FantasyLeagueView(MethodView):
     """ View to handle Fantasy Leagues """
+    decorators = [token_required]
 
     def get(self, league_id=None):
         if league_id:
@@ -68,6 +69,8 @@ class FantasyLeagueView(MethodView):
 
 
 class FantasyLeagueUsersView(MethodView):
+    """View to handle Fantasy League for users"""
+    decorators = [token_required]
 
     def get(self, fantasy_league_id):
         league = FantasyLeague.find_first(id=fantasy_league_id)

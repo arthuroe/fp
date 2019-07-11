@@ -12,6 +12,8 @@ class SeasonsView(MethodView):
     View to handle Teams
     """
 
+    @token_required
+    @admin_required
     def get(self, season_id=None):
         if season_id:
             season = Season.find_first(id=season_id)
@@ -41,6 +43,8 @@ class SeasonsView(MethodView):
         }
         return make_response(jsonify(response)), 200
 
+    @token_required
+    @admin_required
     def post(self):
         post_data = request.json
         logo = post_data.get('logo')
@@ -82,6 +86,8 @@ class SeasonsView(MethodView):
             }
             return make_response(jsonify(response)), 400
 
+    @token_required
+    @admin_required
     def put(self, season_id):
         try:
             kwargs = request.json
@@ -109,6 +115,8 @@ class SeasonsView(MethodView):
             }
             return make_response(jsonify(response)), 400
 
+    @token_required
+    @admin_required
     def delete(self, season_id):
         try:
 

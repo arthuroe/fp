@@ -4,7 +4,7 @@ from flask import request, make_response, jsonify
 from flask.views import MethodView
 
 from .helpers import add_jersey_to_player
-from api.decorators import token_required
+from api.decorators import token_required, admin_required
 from api.models import Player
 
 
@@ -13,6 +13,7 @@ class PlayersView(MethodView):
     View to handle Players
     """
 
+    @token_required
     def get(self, player_id=None):
         if player_id:
             player = Player.find_first(id=player_id)
@@ -47,6 +48,8 @@ class PlayersView(MethodView):
         }
         return make_response(jsonify(response)), 200
 
+    @token_required
+    @admin_required
     def post(self):
         kwargs = request.json
         team_id = request.json.get('team_id')
@@ -77,6 +80,8 @@ class PlayersView(MethodView):
             }
             return make_response(jsonify(response)), 400
 
+    @token_required
+    @admin_required
     def put(self, player_id):
         try:
             kwargs = request.json
@@ -104,6 +109,8 @@ class PlayersView(MethodView):
             }
             return make_response(jsonify(response)), 400
 
+    @token_required
+    @admin_required
     def delete(self, player_id):
         try:
             player = Player.find_first(id=player_id)

@@ -12,6 +12,8 @@ class TeamsView(MethodView):
     View to handle Teams
     """
 
+    @token_required
+    @admin_required
     def post(self):
         post_data = request.json
         name = post_data.get('name')
@@ -45,6 +47,7 @@ class TeamsView(MethodView):
             }
             return make_response(jsonify(response)), 400
 
+    @token_required
     def get(self, team_id=None):
         if team_id:
             team = Team.find_first(id=team_id)
@@ -74,6 +77,8 @@ class TeamsView(MethodView):
         }
         return make_response(jsonify(response)), 200
 
+    @token_required
+    @admin_required
     def put(self, team_id):
         try:
             kwargs = request.json
@@ -101,6 +106,8 @@ class TeamsView(MethodView):
             }
             return make_response(jsonify(response)), 400
 
+    @token_required
+    @admin_required
     def delete(self, team_id):
         try:
             team = Team.find_first(id=team_id)

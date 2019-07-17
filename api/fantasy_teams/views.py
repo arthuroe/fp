@@ -111,9 +111,15 @@ class PlayerFantasyTeamView(MethodView):
                 }
                 return make_response(jsonify(response)), 400
             players = fantasy_team.players
-            check_max_players_from_team(player, players)
 
-            if len(fantasy_team.players) >= 2:
+            if not check_max_players_from_team(player, fantasy_team.players):
+                response = {
+                    'status': 'fail',
+                    'message': 'Maximum player limit from team reached.'
+                }
+                return make_response(jsonify(response)), 400
+
+            if len(fantasy_team.players) >= 15:
                 response = {
                     'status': 'fail',
                     'message': 'Player limit reached.'

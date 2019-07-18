@@ -18,6 +18,7 @@ from api.seasons import seasons_blueprint
 from api.players import players_blueprint
 from api.fantasy_teams import fantasy_team_blueprint
 from api.fantasy_leagues import fantasy_league_blueprint
+from api.articles import articles_blueprint
 
 db.init_app(app)
 
@@ -26,6 +27,7 @@ app.register_blueprint(teams_blueprint)
 app.register_blueprint(seasons_blueprint)
 app.register_blueprint(players_blueprint)
 app.register_blueprint(fantasy_team_blueprint)
+app.register_blueprint(fantasy_league_blueprint)
 app.register_blueprint(fantasy_league_blueprint)
 
 # add support for CORS for all end points

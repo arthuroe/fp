@@ -71,3 +71,34 @@ class ArticlesView(MethodView):
                 'message': 'Failed to create Article.'
             }
             return make_response(jsonify(response)), 400
+
+    def put(self, article_id):
+        kwargs = request.json
+        article = Article.find_first(id=article_id)
+
+        if not article:
+            response = {
+                'status': 'Fail',
+                'message': 'Article does not exist'
+            }
+            return make_response(jsonify(response)), 400
+
+        try:
+
+            article.update(**kwargs)
+            response = {
+                'status': 'success',
+                'message': f'Successfully updated {title}'
+            }
+            return make_response(jsonify(response)), 200
+
+        except Exception as e:
+            logging.error(f"An error has occurred  {e}")
+            response = {
+                'status': 'fail',
+                'message': 'Failed to update Article.'
+            }
+            return make_response(jsonify(response)), 400
+
+    def delete(self):
+        pass

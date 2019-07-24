@@ -100,5 +100,28 @@ class ArticlesView(MethodView):
             }
             return make_response(jsonify(response)), 400
 
-    def delete(self):
-        pass
+    def delete(self, article_id):
+        article = Article.find_first(id=article_id)
+
+        if not article:
+            response = {
+                'status': 'Fail',
+                'message': 'Article does not exist'
+            }
+            return make_response(jsonify(response)), 400
+
+        try:
+            article.delete()
+            response = {
+                'status': 'Success',
+                'message': 'Deleted article'
+            }
+            return make_response(jsonify(response)), 200
+
+        except Exception as e:
+            logging.error(f"An error has occurred  {e}")
+            response = {
+                'status': 'fail',
+                'message': 'Failed to delete article.'
+            }
+            return make_response(jsonify(response)), 400

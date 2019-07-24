@@ -3,12 +3,17 @@ import logging
 from flask import Blueprint, request, make_response, jsonify
 from flask.views import MethodView
 
+from api.decorators import token_required
 from api.models import Article
 
 
 class ArticlesView(MethodView):
+    """
+    View to handle Articles
+    """
+    decorators = [token_required]
 
-    def get(self, article_id):
+    def get(self, article_id=None):
         if article_id:
             article = Article.find_first(id=article_id)
             if not article:
@@ -39,4 +44,30 @@ class ArticlesView(MethodView):
         return make_response(jsonify(response)), 200
 
     def post(self):
-        pass
+        kwargs = request.json
+        title = kwargs.get('title')
+        body = kwargs.get('body')
+
+        if not all([title, body]):
+            response = {
+                'status': 'fail',
+                'message': 'Incomplete data. All fields are required'
+            }
+            return make_response(jsonify(response)), 400
+
+        try:
+            article = Article(**kwargs)
+            article.save()
+            response = {
+                'status': 'success',
+                'message': f'Successfully added {title}'
+            }
+            return make_response(jsonify(response)), 201
+
+        except Exception as e:
+            logging.error(f"An error has occurred  {e}")
+            response = {
+                'status': 'fail',
+                'message': 'Failed to create Article.'
+            }
+            return make_response(jsonify(response)), 400

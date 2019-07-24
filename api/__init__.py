@@ -28,7 +28,7 @@ app.register_blueprint(seasons_blueprint)
 app.register_blueprint(players_blueprint)
 app.register_blueprint(fantasy_team_blueprint)
 app.register_blueprint(fantasy_league_blueprint)
-app.register_blueprint(fantasy_league_blueprint)
+app.register_blueprint(articles_blueprint)
 
 # add support for CORS for all end points
 CORS(app)

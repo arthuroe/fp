@@ -7,3 +7,7 @@ articles_view = ArticlesView.as_view('articles_api')
 
 articles_blueprint.add_url_rule(
     '/articles', view_func=articles_view, methods=['POST', 'GET'])
+articles_blueprint.add_url_rule(
+    '/articles/<article_id>', view_func=articles_view,
+    methods=['GET', 'PUT', 'DELETE']
+)

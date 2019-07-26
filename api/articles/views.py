@@ -13,7 +13,7 @@ class ArticlesView(MethodView):
     """
     decorators = [token_required]
 
-    def get(self, article_id=None):
+    def get(self, current_user, article_id=None):
         if article_id:
             article = Article.find_first(id=article_id)
             if not article:
@@ -43,7 +43,7 @@ class ArticlesView(MethodView):
         }
         return make_response(jsonify(response)), 200
 
-    def post(self):
+    def post(self, current_user):
         kwargs = request.json
         title = kwargs.get('title')
         body = kwargs.get('body')
@@ -72,8 +72,9 @@ class ArticlesView(MethodView):
             }
             return make_response(jsonify(response)), 400
 
-    def put(self, article_id):
+    def put(self, current_user, article_id):
         kwargs = request.json
+        kwargs.update({'id': article_id})
         article = Article.find_first(id=article_id)
 
         if not article:
@@ -84,11 +85,10 @@ class ArticlesView(MethodView):
             return make_response(jsonify(response)), 400
 
         try:
-
             article.update(**kwargs)
             response = {
                 'status': 'success',
-                'message': f'Successfully updated {title}'
+                'message': f'Successfully updated {article.title}'
             }
             return make_response(jsonify(response)), 200
 
@@ -100,7 +100,7 @@ class ArticlesView(MethodView):
             }
             return make_response(jsonify(response)), 400
 
-    def delete(self, article_id):
+    def delete(self, current_user, article_id):
         article = Article.find_first(id=article_id)
 
         if not article:

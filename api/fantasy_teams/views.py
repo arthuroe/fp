@@ -154,3 +154,71 @@ class PlayerFantasyTeamView(MethodView):
                 'message': 'Failed to add player.'
             }
             return make_response(jsonify(response)), 400
+
+
+class CaptainView(MethodView):
+    """
+    View to handle Fantasy Team Captains
+    """
+    decorators = [token_required]
+
+    def get(self, current_user):
+        fantasy_team = FantasyTeam.find_first(user_id=current_user.id)
+        captain = fantasy_team.captain
+
+        if not captain:
+            response = {
+                'status': 'success',
+                'message': f'{fantasy_team.name} has no captain.'
+            }
+            return make_response(jsonify(response)), 200
+
+        player = Player.find_first(id=captain)
+        response = {
+            'status': 'success',
+            'player': player.serialize()
+        }
+        return make_response(jsonify(response)), 200
+
+    def post(self, current_user, player_id):
+        pass
+
+    def put(self, current_user, player_id):
+        pass
+
+    def delete(self, current_user, player_id):
+        pass
+
+
+class ViceCaptainView(MethodView):
+    """
+    View to handle Fantasy Team Vice Captains
+    """
+    decorators = [token_required]
+
+    def get(self, current_user):
+        fantasy_team = FantasyTeam.find_first(user_id=current_user.id)
+        vice_captain = fantasy_team.vice_captain
+
+        if not vice_captain:
+            response = {
+                'status': 'success',
+                'message': f'{fantasy_team.name} has no captain.'
+            }
+            return make_response(jsonify(response)), 200
+
+        player = Player.find_first(id=vice_captain)
+        response = {
+            'status': 'success',
+            'player': player.serialize()
+        }
+        return make_response(jsonify(response)), 200
+
+    def post(self, current_user, player_id):
+        pass
+
+    def put(self, current_user, player_id):
+        pass
+
+    def delete(self, current_user, player_id):
+        pass

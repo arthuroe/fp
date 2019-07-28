@@ -13,3 +13,5 @@ class FantasyTeam(ModelMixin):
     money = db.Column(db.Integer)
     season_id = db.Column(db.Integer, db.ForeignKey(
         'seasons.id'), nullable=False)
+    captain = db.Column(db.Integer)
+    vice_captain = db.Column(db.Integer)

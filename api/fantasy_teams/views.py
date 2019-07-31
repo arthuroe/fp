@@ -208,12 +208,6 @@ class CaptainView(MethodView):
             }
             return make_response(jsonify(response)), 400
 
-    def put(self, current_user, player_id):
-        pass
-
-    def delete(self, current_user, player_id):
-        pass
-
 
 class ViceCaptainView(MethodView):
     """
@@ -267,9 +261,3 @@ class ViceCaptainView(MethodView):
                 'message': 'Failed to add player as vice captain.'
             }
             return make_response(jsonify(response)), 400
-
-    def put(self, current_user, player_id):
-        pass
-
-    def delete(self, current_user, player_id):
-        pass

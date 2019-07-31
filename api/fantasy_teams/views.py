@@ -181,7 +181,32 @@ class CaptainView(MethodView):
         return make_response(jsonify(response)), 200
 
     def post(self, current_user, player_id):
-        pass
+        fantasy_team = FantasyTeam.find_first(user_id=current_user.id)
+        player = Player.find_first(id=player_id)
+
+        if not player:
+            response = {
+                'status': 'fail',
+                'message': 'Player does not exist'
+            }
+            return make_response(jsonify(response)), 200
+
+        try:
+            fantasy_team.captain = player_id
+            fantasy_team.save()
+            response = {
+                'status': 'success',
+                'message': f'Successfully added {player.name} as captain.'
+            }
+            return make_response(jsonify(response)), 201
+
+        except Exception as e:
+            logging.error(f"An error has occurred  {e}")
+            response = {
+                'status': 'fail',
+                'message': 'Failed to add player as captain.'
+            }
+            return make_response(jsonify(response)), 400
 
     def put(self, current_user, player_id):
         pass
@@ -215,7 +240,33 @@ class ViceCaptainView(MethodView):
         return make_response(jsonify(response)), 200
 
     def post(self, current_user, player_id):
-        pass
+        fantasy_team = FantasyTeam.find_first(user_id=current_user.id)
+        player = Player.find_first(id=player_id)
+
+        if not player:
+            response = {
+                'status': 'fail',
+                'message': 'Player does not exist'
+            }
+            return make_response(jsonify(response)), 200
+
+        try:
+            fantasy_team.vice_captain = player_id
+            fantasy_team.save()
+            response = {
+                'status': 'success',
+                'message': (f'Successfully added {player.name} as'
+                            ' vice_captain.')
+            }
+            return make_response(jsonify(response)), 201
+
+        except Exception as e:
+            logging.error(f"An error has occurred  {e}")
+            response = {
+                'status': 'fail',
+                'message': 'Failed to add player as vice captain.'
+            }
+            return make_response(jsonify(response)), 400
 
     def put(self, current_user, player_id):
         pass

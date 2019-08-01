@@ -65,7 +65,8 @@ class User(ModelMixin):
         Decodes the access token from the Authorization header.
         """
         try:
-            payload = jwt.decode(token, app.config.get('SECRET_KEY'))
+            payload = jwt.decode(
+                token, app.config.get('SECRET_KEY'), algorithms='HS256')
             return payload['sub']
         except jwt.ExpiredSignatureError:
             return "Expired token. Please login to get a new token"

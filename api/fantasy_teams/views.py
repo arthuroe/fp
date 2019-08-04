@@ -505,3 +505,10 @@ class StartingPlayersView(MethodView):
                 'message': 'Failed to substitute player.'
             }
             return make_response(jsonify(response)), 500
+
+
+class TeamOfWeekView(MethodView):
+    "View to handle team of the week"
+
+    def get(self):
+        pass

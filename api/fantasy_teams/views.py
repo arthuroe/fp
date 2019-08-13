@@ -511,4 +511,42 @@ class TeamOfWeekView(MethodView):
     "View to handle team of the week"
 
     def get(self):
-        pass
+        forwards = []
+        centers = []
+        backs = []
+        team_of_the_week = []
+        players = Player.fetch_all()
+        for player in players:
+            if player.position == 'forwards':
+                forwards.append(player)
+
+            if player.position == 'centers':
+                forwards.append(player)
+
+            if player.position == 'backs':
+                forwards.append(player)
+
+        if forwards:
+            top_forwards = forwards[:3]
+            team_of_the_week.extend(top_forwards)
+
+        if centers:
+            centers = centers[:3]
+            team_of_the_week.extend(top_centers)
+
+        if backs:
+            backs = backs[:3]
+            team_of_the_week.extend(top_backs)
+
+        if team_of_the_week:
+            response = {
+                'status': 'success',
+                'team': [player.serialize() for player in team_of_the_week]
+            }
+            return make_response(jsonify(response)), 200
+
+        response = {
+            'status': 'success',
+            'team': 'No stats have been provided for this yet'
+        }
+        return make_response(jsonify(response)), 200

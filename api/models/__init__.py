@@ -3,6 +3,7 @@ from .articles import Article
 from .fantasy_league import FantasyLeague
 from .fantasyleague_team import FantasyLeagueTeam
 from .fantasy_team import FantasyTeam
+from .fixtures import Fixture
 from .pivot_tables import *
 from .players import Player
 from .season import Season

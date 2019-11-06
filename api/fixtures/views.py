@@ -41,5 +41,23 @@ class FixturesView(MethodView):
         }
         return make_response(jsonify(response)), 200
 
-    def post(self):
-        pass
+    def post(self, season_id):
+        kwargs = request.json()
+        kwargs.update({"season_id": season_id})
+        try:
+            fixture = Fixture(**kwargs)
+            fixture.save()
+            response = {
+                'status': 'success',
+                'message': f"Successfully added {kwargs.get('home_name')} vs "
+                f"{kwargs.get('away_name')}"
+            }
+            return make_response(jsonify(response)), 201
+
+        except Exception as e:
+            logging.error(f"An error has occurred  {e}")
+            response = {
+                'status': 'fail',
+                'message': 'Failed to add fixture.'
+            }
+            return make_response(jsonify(response)), 400

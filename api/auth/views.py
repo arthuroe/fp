@@ -71,26 +71,34 @@ class LoginView(MethodView):
     """
 
     def post(self):
-        post_data = request.json
-        email = post_data.get('email')
-        password = post_data.get('password')
-
-        if not email or not password:
-            response = {
-                'status': 'fail',
-                'message': 'email or password not provided.'
-            }
-            return make_response(jsonify(response)), 400
-
-        if not validate_email(email):
-            response = {
-                'status': 'fail',
-                'message': 'Invalid email or password provided'
-            }
-            return make_response(jsonify(response)), 400
-
         try:
+            post_data = request.json
+            email = post_data.get('email')
+            password = post_data.get('password')
+
+            if not email or not password:
+                response = {
+                    'status': 'fail',
+                    'message': 'email or password not provided.'
+                }
+                return make_response(jsonify(response)), 400
+
+            if not validate_email(email):
+                response = {
+                    'status': 'fail',
+                    'message': 'Invalid email or password provided'
+                }
+                return make_response(jsonify(response)), 400
+
             user = User.find_first(email=email)
+
+            if user and not user.password_is_valid(password):
+                response = {
+                    'status': 'fail',
+                    'message': 'Invalid email or password provided'
+                }
+                return make_response(jsonify(response)), 401
+
             if user and user.password_is_valid(password):
                 auth_token = user.generate_token(user.id)
                 if auth_token:

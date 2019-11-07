@@ -12,5 +12,5 @@ class Fixture(ModelMixin):
     date = db.Column(db.DateTime, nullable=False)
     home_team = db.Column(db.String(180))
     away_team = db.Column(db.String(180))
-    season_id = db.Column(db.Integer, db.ForeignKey(
-        'seasons.id'), nullable=False)
+    game_week_id = db.Column(db.Integer, db.ForeignKey(
+        'gameweeks.id'), nullable=False)

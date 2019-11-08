@@ -13,4 +13,4 @@ class GameWeek(ModelMixin):
     season_id = db.Column(db.Integer, db.ForeignKey(
         'seasons.id'), nullable=False)
     fixtures = db.relationship(
-        "Fixtures", backref="fixtures", secondary="game_week", lazy="dynamic")
+        "Fixture", backref="game_week", lazy="dynamic")

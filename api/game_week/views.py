@@ -61,4 +61,22 @@ class GameWeekView(MethodView):
         return make_response(jsonify(response)), 200
 
     def post(self, season_id):
-        pass
+        kwargs = request.json()
+        kwargs.update({"season_id": season_id})
+
+        try:
+            game_week = GameWeek(**kwargs)
+            game_week.save()
+
+            response = {
+                'status': 'success',
+                'message': f'Successfully added {game_week.date} gameweek.'
+            }
+            return make_response(jsonify(response)), 201
+        except Exception as e:
+            logging.error(f"An error has occurred  {e}")
+            response = {
+                'status': 'fail',
+                'message': 'Failed to add gameweek.'
+            }
+            return make_response(jsonify(response)), 400

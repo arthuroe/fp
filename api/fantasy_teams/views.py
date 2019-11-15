@@ -5,7 +5,7 @@ from flask.views import MethodView
 
 from .helpers import check_max_players_from_team
 from api.decorators import token_required, admin_required
-from api.models import FantasyTeam, Player
+from api.models import FantasyTeam, Player, User
 
 
 class FantasyTeamView(MethodView):
@@ -58,8 +58,21 @@ class FantasyTeamView(MethodView):
             return make_response(jsonify(response)), 400
 
         try:
+            user = User.find_first(id=user_id)
+
+            if not user:
+                response = {
+                    'status': 'fail',
+                    'message': 'User does not exist.'
+                }
+                return make_response(jsonify(response)), 400
+
             fantasy_team = FantasyTeam(**kwargs)
             fantasy_team.save()
+
+            user.fantasy_team_created = True
+            user.save()
+
             response = {
                 'status': 'success',
                 'message': f'Successfully added {name}'

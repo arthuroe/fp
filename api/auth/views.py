@@ -143,8 +143,14 @@ class UserView(MethodView):
                 }
                 return make_response(jsonify(response)), 400
 
-            user = user.serialize()
-            del user['password']
+            user = {
+                "email": user.email,
+                "fantasy_team_created": user.fantasy_team_created,
+                "id": user.id,
+                "is_admin": user.is_admin,
+                "name": user.name,
+                "photo": user.photo,
+            }
             response = {
                 'status': 'success',
                 'user': user

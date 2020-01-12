@@ -4,6 +4,7 @@ from flask import Blueprint, request, make_response, jsonify
 from flask.views import MethodView
 
 from api.auth.helpers import *
+from api.decorators import token_required
 from api.models import User
 
 
@@ -121,3 +122,38 @@ class LoginView(MethodView):
                 'message': 'An error has occurred. Please try again.'
             }
             return make_response(jsonify(response)), 500
+
+
+class UserView(MethodView):
+    """
+    View to handle user and details
+    """
+    decorators = [token_required]
+
+    def get(self, current_user):
+        user_id = current_user.id
+
+        try:
+            user = User.find_first(id=user_id)
+
+            if not user:
+                response = {
+                    'status': 'fail',
+                    'message': 'User does not exist.'
+                }
+                return make_response(jsonify(response)), 400
+
+            user = user.serialize()
+            del user['password']
+            response = {
+                'status': 'success',
+                'user': user
+            }
+            return make_response(jsonify(response)), 200
+        except Exception as e:
+            logging.error(f"An error has occurred  {e}")
+            response = {
+                'status': 'fail',
+                'message': 'Failed to retrieve user.'
+            }
+            return make_response(jsonify(response)), 400

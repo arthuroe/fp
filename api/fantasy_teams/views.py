@@ -33,7 +33,7 @@ class FantasyTeamView(MethodView):
         if not fantasy_teams:
             response = {
                 'status': 'success',
-                'message': 'No seasons have been added'
+                'message': 'No Fantasy teams have been added'
             }
             return make_response(jsonify(response)), 200
 
@@ -49,8 +49,9 @@ class FantasyTeamView(MethodView):
         user_id = current_user.id
         kwargs.update({"user_id": user_id})
         name = request.json.get('name')
+        season_id = request.json.get('season_id')
 
-        if not all([name]):
+        if not all([name, season_id]):
             response = {
                 'status': 'fail',
                 'message': 'Incomplete data. All fields are required'
@@ -146,6 +147,63 @@ class PlayerFantasyTeamView(MethodView):
                 'message': f'Successfully added {player.name}'
             }
             return make_response(jsonify(response)), 201
+
+        except Exception as e:
+            logging.error(f"An error has occurred  {e}")
+            response = {
+                'status': 'fail',
+                'message': 'Failed to add player.'
+            }
+            return make_response(jsonify(response)), 400
+
+    def put(self, current_user, fantasy_team_id):
+        player_id = request.json.get('player_id')
+        current_player_id = request.json.get('current_player_id')
+
+        try:
+            fantasy_team = FantasyTeam.find_first(id=fantasy_team_id)
+            player = Player.find_first(id=player_id)
+            current_player = Player.find_first(id=current_player_id)
+
+            if player in fantasy_team.players:
+                response = {
+                    'status': 'fail',
+                    'message': 'Player already added.'
+                }
+                return make_response(jsonify(response)), 400
+            players = fantasy_team.players
+
+            fantasy_team.players.remove(current_player)
+            fantasy_team.players.append(player)
+            fantasy_team.save()
+            response = {
+                'status': 'success',
+                'message': f'Successfully added {player.name}'
+            }
+            return make_response(jsonify(response)), 201
+
+        except Exception as e:
+            logging.error(f"An error has occurred  {e}")
+            response = {
+                'status': 'fail',
+                'message': 'Failed to add player.'
+            }
+            return make_response(jsonify(response)), 400
+
+    def delete(self, current_user, fantasy_team_id):
+        player_id = request.json.get('player_id')
+
+        try:
+            fantasy_team = FantasyTeam.find_first(id=fantasy_team_id)
+            player = Player.find_first(id=player_id)
+
+            fantasy_team.players.remove(player)
+            fantasy_team.save()
+            response = {
+                'status': 'success',
+                'message': f'Successfully removed {player.name}'
+            }
+            return make_response(jsonify(response)), 200
 
         except Exception as e:
             logging.error(f"An error has occurred  {e}")

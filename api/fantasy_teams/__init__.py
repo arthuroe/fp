@@ -14,7 +14,7 @@ fantasy_team_players_view = PlayerFantasyTeamView.as_view(
 fantasy_team_blueprint.add_url_rule(
     '/fantasy_team_players/<fantasy_team_id>',
     view_func=fantasy_team_players_view,
-    methods=['GET', 'POST']
+    methods=['GET', 'POST', 'PUT', 'DELETE']
 )
 
 fantasy_team_captain_view = PlayerFantasyTeamView.as_view(

@@ -5,6 +5,6 @@ def check_max_players_from_team(player, fantasy_team):
     if player.team_id not in frequency.keys():
         return True
 
-    for i in frequency:
-        if frequency[i] == player.team_id:
-            return False if frequency[i] >= 3 else True
+    for team_id in frequency:
+        if team_id == player.team_id:
+            return False if frequency[team_id] >= 3 else True

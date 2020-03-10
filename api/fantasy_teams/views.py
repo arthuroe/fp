@@ -68,6 +68,13 @@ class FantasyTeamView(MethodView):
                 }
                 return make_response(jsonify(response)), 400
 
+            if user.fantasy_team_created:
+                response = {
+                    'status': 'fail',
+                    'message': 'Fantasy team already created.'
+                }
+                return make_response(jsonify(response)), 209
+
             fantasy_team = FantasyTeam(**kwargs)
             fantasy_team.save()
 

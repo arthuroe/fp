@@ -59,6 +59,15 @@ class FantasyTeamView(MethodView):
             return make_response(jsonify(response)), 400
 
         try:
+            duplicate_fantasy_teams = FantasyTeam.find_first(name=name)
+
+            if duplicate_fantasy_teams:
+                response = {
+                    'status': 'fail',
+                    'message': 'Fantasy team name already exits.'
+                }
+                return make_response(jsonify(response)), 209
+
             user = User.find_first(id=user_id)
 
             if not user:
@@ -71,7 +80,7 @@ class FantasyTeamView(MethodView):
             if user.fantasy_team_created:
                 response = {
                     'status': 'fail',
-                    'message': 'Fantasy team already created.'
+                    'message': f'Fantasy team already created for {user.name}.'
                 }
                 return make_response(jsonify(response)), 209
 
@@ -94,6 +103,35 @@ class FantasyTeamView(MethodView):
             }
             return make_response(jsonify(response)), 400
 
+    def put(self, current_user, fantasy_team_id):
+        name = request.json.get('name')
+        try:
+            duplicate_fantasy_teams = FantasyTeam.find_first(name=name)
+
+            if duplicate_fantasy_teams:
+                response = {
+                    'status': 'fail',
+                    'message': 'Fantasy team name already exits.'
+                }
+                return make_response(jsonify(response)), 209
+
+            fantasy_team = FantasyTeam.find_first(id=fantasy_team_id)
+            fantasy_team.name = name
+            fantasy_team.save()
+            response = {
+                'status': 'success',
+                'message': f'Successfully updated to {fantasy_team.name}'
+            }
+            return make_response(jsonify(response)), 201
+
+        except Exception as e:
+            logging.error(f"An error has occurred  {e}")
+            response = {
+                'status': 'fail',
+                'message': 'Failed to add player.'
+            }
+            return make_response(jsonify(response)), 400
+
 
 class PlayerFantasyTeamView(MethodView):
     """
@@ -103,6 +141,13 @@ class PlayerFantasyTeamView(MethodView):
 
     def get(self, current_user, fantasy_team_id):
         fantasy_team = FantasyTeam.find_first(id=fantasy_team_id)
+        if not fantasy_team:
+            response = {
+                'status': 'fail',
+                'mesage': 'fantasy_team does not exist'
+            }
+            return make_response(jsonify(response)), 400
+
         players = fantasy_team.players
 
         if not players:

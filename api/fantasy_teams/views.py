@@ -104,9 +104,10 @@ class FantasyTeamView(MethodView):
             return make_response(jsonify(response)), 400
 
     def put(self, current_user, fantasy_team_id):
+        user_id = current_user.id
         name = request.json.get('name')
         try:
-            duplicate_fantasy_teams = FantasyTeam.find_first(name=name)
+            duplicate_fantasy_teams = FantasyTeam.find_first(user_id=user_id)
 
             if duplicate_fantasy_teams:
                 response = {
@@ -164,10 +165,11 @@ class PlayerFantasyTeamView(MethodView):
         return make_response(jsonify(response)), 200
 
     def post(self, current_user, fantasy_team_id):
+        user_id = current_user.id
         player_id = request.json.get('player_id')
 
         try:
-            fantasy_team = FantasyTeam.find_first(id=fantasy_team_id)
+            fantasy_team = FantasyTeam.find_first(user_id=user_id)
             player = Player.find_first(id=player_id)
 
             if player in fantasy_team.players:
@@ -290,8 +292,9 @@ class CaptainView(MethodView):
         }
         return make_response(jsonify(response)), 200
 
-    def post(self, current_user, player_id):
+    def post(self, current_user):
         fantasy_team = FantasyTeam.find_first(user_id=current_user.id)
+        player_id = request.json.get('player_id')
         player = Player.find_first(id=player_id)
 
         if not player:
@@ -332,7 +335,7 @@ class ViceCaptainView(MethodView):
         if not vice_captain:
             response = {
                 'status': 'success',
-                'message': f'{fantasy_team.name} has no captain.'
+                'message': f'{fantasy_team.name} has no vice captain.'
             }
             return make_response(jsonify(response)), 200
 
@@ -343,8 +346,9 @@ class ViceCaptainView(MethodView):
         }
         return make_response(jsonify(response)), 200
 
-    def post(self, current_user, player_id):
+    def post(self, current_user):
         fantasy_team = FantasyTeam.find_first(user_id=current_user.id)
+        player_id = request.json.get('player_id')
         player = Player.find_first(id=player_id)
 
         if not player:

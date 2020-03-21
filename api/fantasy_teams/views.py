@@ -302,7 +302,21 @@ class CaptainView(MethodView):
                 'status': 'fail',
                 'message': 'Player does not exist'
             }
-            return make_response(jsonify(response)), 200
+            return make_response(jsonify(response)), 400
+
+        if player_id == fantasy_team.vice_captain:
+            response = {
+                'status': 'fail',
+                'message': 'Player is already vice captain.'
+            }
+            return make_response(jsonify(response)), 400
+
+        if player not in fantasy_team.players:
+            response = {
+                'status': 'fail',
+                'message': 'Player not in fantasy team.'
+            }
+            return make_response(jsonify(response)), 400
 
         try:
             fantasy_team.captain = player_id
@@ -356,7 +370,21 @@ class ViceCaptainView(MethodView):
                 'status': 'fail',
                 'message': 'Player does not exist'
             }
-            return make_response(jsonify(response)), 200
+            return make_response(jsonify(response)), 400
+
+        if player not in fantasy_team.players:
+            response = {
+                'status': 'fail',
+                'message': 'Player not in fantasy team.'
+            }
+            return make_response(jsonify(response)), 400
+
+        if player_id == fantasy_team.captain:
+            response = {
+                'status': 'fail',
+                'message': 'Player is already captain.'
+            }
+            return make_response(jsonify(response)), 400
 
         try:
             fantasy_team.vice_captain = player_id

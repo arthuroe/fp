@@ -4,6 +4,7 @@ from flask import request, make_response, jsonify
 from flask.views import MethodView
 
 from .helpers import check_max_players_from_team
+from api.players.helpers import add_jersey_to_player
 from api.decorators import token_required, admin_required
 from api.models import FantasyTeam, Player, User
 
@@ -158,9 +159,11 @@ class PlayerFantasyTeamView(MethodView):
             }
             return make_response(jsonify(response)), 200
 
+        players = [player.serialize() for player in players]
+        add_jersey_to_player(players)
         response = {
             'status': 'success',
-            'players': [player.serialize() for player in players]
+            'players': players
         }
         return make_response(jsonify(response)), 200
 

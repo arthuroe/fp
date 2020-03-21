@@ -3,6 +3,7 @@ import logging
 from flask import request, make_response, jsonify
 from flask.views import MethodView
 
+from .helpers import add_jersey_to_player
 from api.decorators import token_required
 from api.models import Player
 
@@ -21,9 +22,12 @@ class PlayersView(MethodView):
                     'message': 'Player does not exist'
                 }
                 return make_response(jsonify(response)), 400
+
+            player = [player.serialize()]
+            add_jersey_to_player(player)
             response = {
                 'status': 'success',
-                'players': player.serialize()
+                'players': player
             }
             return make_response(jsonify(response)), 200
 
@@ -35,9 +39,11 @@ class PlayersView(MethodView):
             }
             return make_response(jsonify(response)), 200
 
+        players = [player.serialize() for player in players]
+        add_jersey_to_player(players)
         response = {
             'status': 'success',
-            'players': [player.serialize() for player in players]
+            'players': players
         }
         return make_response(jsonify(response)), 200
 

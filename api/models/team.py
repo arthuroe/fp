@@ -11,6 +11,7 @@ class Team(ModelMixin):
     logo = db.Column(db.String(180))
     league_position = db.Column(db.Integer)
     manager = db.Column(db.String(180))
+    jersey = db.Column(db.String(180))
     players = db.relationship(
         "Player", backref="team", lazy="dynamic")
     season = db.relationship(

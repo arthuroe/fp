@@ -3,7 +3,7 @@ import logging
 from flask import request, make_response, jsonify
 from flask.views import MethodView
 
-from api.decorators import token_required
+from api.decorators import admin_required, token_required
 from api.models import GameWeek
 
 
@@ -12,6 +12,7 @@ class GameWeekView(MethodView):
     View to handle Game Weeks
     """
 
+    @token_required
     def get(self, season_id, game_week_id=None):
         if game_week_id:
             game_week = GameWeek.find_first(
@@ -22,7 +23,7 @@ class GameWeekView(MethodView):
                     'status': 'fail',
                     'message': 'GameWeek does not exist'
                 }
-                return make_response(jsonify(response)), 400
+                return make_response(jsonify(response)), 404
 
             response = {
                 'status': 'success',
@@ -37,7 +38,7 @@ class GameWeekView(MethodView):
                     'status': 'fail',
                     'message': 'Season does not exist'
                 }
-                return make_response(jsonify(response)), 400
+                return make_response(jsonify(response)), 404
 
             response = {
                 'status': 'success',
@@ -60,6 +61,8 @@ class GameWeekView(MethodView):
         }
         return make_response(jsonify(response)), 200
 
+    @token_required
+    @admin_required
     def post(self, season_id):
         kwargs = request.json()
         kwargs.update({"season_id": season_id})
@@ -79,4 +82,63 @@ class GameWeekView(MethodView):
                 'status': 'fail',
                 'message': 'Failed to add gameweek.'
             }
-            return make_response(jsonify(response)), 400
+            return make_response(jsonify(response)), 500
+
+    @token_required
+    @admin_required
+    def put(self, game_week_id):
+        kwargs = request.json()
+        kwargs.update({"season_id": season_id, "id": game_week_id})
+
+        try:
+            game_week = GameWeek.find_first(id=game_week_id)
+
+            if gameweek:
+                game_week.update(**kwargs)
+
+                response = {
+                    'status': 'success',
+                    'message': f'Successfully updated {game_week.date} gameweek.'
+                }
+                return make_response(jsonify(response)), 201
+
+            response = {
+                'status': 'Fail',
+                'message': 'player does not exist'
+            }
+            return make_response(jsonify(response)), 404
+        except Exception as e:
+            logging.error(f"An error has occurred  {e}")
+            response = {
+                'status': 'fail',
+                'message': 'Failed to update gameweek.'
+            }
+            return make_response(jsonify(response)), 500
+
+    @token_required
+    @admin_required
+    def delete(self, game_week_id):
+        try:
+            game_week = GameWeek.find_first(id=game_week_id)
+
+            if gameweek:
+                game_week.delete()
+
+                response = {
+                    'status': 'success',
+                    'message': f'Successfully deleted {game_week.date} gameweek.'
+                }
+                return make_response(jsonify(response)), 201
+
+            response = {
+                'status': 'Fail',
+                'message': 'player does not exist'
+            }
+            return make_response(jsonify(response)), 404
+        except Exception as e:
+            logging.error(f"An error has occurred  {e}")
+            response = {
+                'status': 'fail',
+                'message': 'Failed to delete gameweek.'
+            }
+            return make_response(jsonify(response)), 500

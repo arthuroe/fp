@@ -14,7 +14,7 @@ class SeasonsView(MethodView):
 
     @token_required
     @admin_required
-    def get(self, season_id=None):
+    def get(self, current_user, season_id=None):
         if season_id:
             season = Season.find_first(id=season_id)
             if not season:
@@ -22,7 +22,7 @@ class SeasonsView(MethodView):
                     'status': 'fail',
                     'message': 'Season does not exist'
                 }
-                return make_response(jsonify(response)), 400
+                return make_response(jsonify(response)), 404
             response = {
                 'status': 'success',
                 'teams': season.serialize()
@@ -45,7 +45,7 @@ class SeasonsView(MethodView):
 
     @token_required
     @admin_required
-    def post(self):
+    def post(self, current_user):
         post_data = request.json
         logo = post_data.get('logo')
         name = post_data.get('name')
@@ -84,11 +84,11 @@ class SeasonsView(MethodView):
                 'status': 'fail',
                 'message': 'Failed to add season.'
             }
-            return make_response(jsonify(response)), 400
+            return make_response(jsonify(response)), 500
 
     @token_required
     @admin_required
-    def put(self, season_id):
+    def put(self, current_user, season_id):
         try:
             kwargs = request.json
             kwargs.update({"id": season_id})
@@ -106,18 +106,18 @@ class SeasonsView(MethodView):
                 'status': 'Fail',
                 'message': 'Season does not exist'
             }
-            return make_response(jsonify(response)), 400
+            return make_response(jsonify(response)), 404
         except Exception as e:
             logging.error(f"An error has occurred  {e}")
             response = {
                 'status': 'fail',
                 'message': 'Failed to update season.'
             }
-            return make_response(jsonify(response)), 400
+            return make_response(jsonify(response)), 500
 
     @token_required
     @admin_required
-    def delete(self, season_id):
+    def delete(self, current_user, season_id):
         try:
 
             season = Season.find_first(id=season_id)
@@ -133,11 +133,11 @@ class SeasonsView(MethodView):
                 'status': 'Fail',
                 'message': 'Season does not exist'
             }
-            return make_response(jsonify(response)), 400
+            return make_response(jsonify(response)), 404
         except Exception as e:
             logging.error(f"An error has occurred  {e}")
             response = {
                 'status': 'fail',
                 'message': 'Failed to delete season.'
             }
-            return make_response(jsonify(response)), 400
+            return make_response(jsonify(response)), 500

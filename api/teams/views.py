@@ -14,7 +14,7 @@ class TeamsView(MethodView):
 
     @token_required
     @admin_required
-    def post(self):
+    def post(self, current_user):
         post_data = request.json
         name = post_data.get('name')
         manager = post_data.get('manager')
@@ -45,10 +45,10 @@ class TeamsView(MethodView):
                 'status': 'fail',
                 'message': 'Failed to add team.'
             }
-            return make_response(jsonify(response)), 400
+            return make_response(jsonify(response)), 500
 
     @token_required
-    def get(self, team_id=None):
+    def get(self, current_user, team_id=None):
         if team_id:
             team = Team.find_first(id=team_id)
             if not team:
@@ -56,7 +56,7 @@ class TeamsView(MethodView):
                     'status': 'fail',
                     'message': 'Team does not exist'
                 }
-                return make_response(jsonify(response)), 400
+                return make_response(jsonify(response)), 404
             response = {
                 'status': 'success',
                 'team': team.serialize()
@@ -79,7 +79,7 @@ class TeamsView(MethodView):
 
     @token_required
     @admin_required
-    def put(self, team_id):
+    def put(self, current_user, team_id):
         try:
             kwargs = request.json
             kwargs.update({"id": team_id})
@@ -97,18 +97,18 @@ class TeamsView(MethodView):
                 'status': 'Fail',
                 'message': 'Team does not exist'
             }
-            return make_response(jsonify(response)), 400
+            return make_response(jsonify(response)), 404
         except Exception as e:
             logging.error(f"An error has occurred  {e}")
             response = {
                 'status': 'fail',
                 'message': 'Failed to update team.'
             }
-            return make_response(jsonify(response)), 400
+            return make_response(jsonify(response)), 500
 
     @token_required
     @admin_required
-    def delete(self, team_id):
+    def delete(self, current_user, team_id):
         try:
             team = Team.find_first(id=team_id)
             if team:
@@ -123,11 +123,11 @@ class TeamsView(MethodView):
                 'status': 'Fail',
                 'message': 'Team does not exist'
             }
-            return make_response(jsonify(response)), 400
+            return make_response(jsonify(response)), 404
         except Exception as e:
             logging.error(f"An error has occurred  {e}")
             response = {
                 'status': 'fail',
                 'message': 'Failed to delete team.'
             }
-            return make_response(jsonify(response)), 400
+            return make_response(jsonify(response)), 500

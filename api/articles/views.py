@@ -3,7 +3,7 @@ import logging
 from flask import Blueprint, request, make_response, jsonify
 from flask.views import MethodView
 
-from api.decorators import token_required
+from api.decorators import admin_required, token_required
 from api.models import Article
 
 
@@ -11,9 +11,8 @@ class ArticlesView(MethodView):
     """
     View to handle Articles
     """
-    decorators = [token_required]
 
-    def get(self, current_user, article_id=None):
+    def get(self, article_id=None):
         if article_id:
             article = Article.find_first(id=article_id)
             if not article:
@@ -21,7 +20,7 @@ class ArticlesView(MethodView):
                     'status': 'fail',
                     'message': 'Article does not exist'
                 }
-                return make_response(jsonify(response)), 400
+                return make_response(jsonify(response)), 404
 
             response = {
                 'status': 'success',
@@ -43,6 +42,8 @@ class ArticlesView(MethodView):
         }
         return make_response(jsonify(response)), 200
 
+    @token_required
+    @admin_required
     def post(self, current_user):
         kwargs = request.json
         title = kwargs.get('title')
@@ -70,8 +71,10 @@ class ArticlesView(MethodView):
                 'status': 'fail',
                 'message': 'Failed to create Article.'
             }
-            return make_response(jsonify(response)), 400
+            return make_response(jsonify(response)), 500
 
+    @token_required
+    @admin_required
     def put(self, current_user, article_id):
         kwargs = request.json
         kwargs.update({'id': article_id})
@@ -82,7 +85,7 @@ class ArticlesView(MethodView):
                 'status': 'Fail',
                 'message': 'Article does not exist'
             }
-            return make_response(jsonify(response)), 400
+            return make_response(jsonify(response)), 404
 
         try:
             article.update(**kwargs)
@@ -98,8 +101,10 @@ class ArticlesView(MethodView):
                 'status': 'fail',
                 'message': 'Failed to update Article.'
             }
-            return make_response(jsonify(response)), 400
+            return make_response(jsonify(response)), 500
 
+    @token_required
+    @admin_required
     def delete(self, current_user, article_id):
         article = Article.find_first(id=article_id)
 
@@ -108,7 +113,7 @@ class ArticlesView(MethodView):
                 'status': 'Fail',
                 'message': 'Article does not exist'
             }
-            return make_response(jsonify(response)), 400
+            return make_response(jsonify(response)), 404
 
         try:
             article.delete()
@@ -124,4 +129,4 @@ class ArticlesView(MethodView):
                 'status': 'fail',
                 'message': 'Failed to delete article.'
             }
-            return make_response(jsonify(response)), 400
+            return make_response(jsonify(response)), 500

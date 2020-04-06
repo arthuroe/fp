@@ -23,7 +23,7 @@ class FantasyTeamView(MethodView):
                     'status': 'fail',
                     'message': 'Fantasy Team does not exist'
                 }
-                return make_response(jsonify(response)), 400
+                return make_response(jsonify(response)), 404
             response = {
                 'status': 'success',
                 'teams': fantasy_team.serialize()
@@ -76,7 +76,7 @@ class FantasyTeamView(MethodView):
                     'status': 'fail',
                     'message': 'User does not exist.'
                 }
-                return make_response(jsonify(response)), 400
+                return make_response(jsonify(response)), 404
 
             if user.fantasy_team_created:
                 response = {
@@ -102,7 +102,7 @@ class FantasyTeamView(MethodView):
                 'status': 'fail',
                 'message': 'Failed to add fantasy_team.'
             }
-            return make_response(jsonify(response)), 400
+            return make_response(jsonify(response)), 500
 
     def put(self, current_user, fantasy_team_id):
         user_id = current_user.id
@@ -132,7 +132,7 @@ class FantasyTeamView(MethodView):
                 'status': 'fail',
                 'message': 'Failed to add player.'
             }
-            return make_response(jsonify(response)), 400
+            return make_response(jsonify(response)), 500
 
 
 class PlayerFantasyTeamView(MethodView):
@@ -148,7 +148,7 @@ class PlayerFantasyTeamView(MethodView):
                 'status': 'fail',
                 'mesage': 'fantasy_team does not exist'
             }
-            return make_response(jsonify(response)), 400
+            return make_response(jsonify(response)), 404
 
         players = fantasy_team.players
 
@@ -211,7 +211,7 @@ class PlayerFantasyTeamView(MethodView):
                 'status': 'fail',
                 'message': 'Failed to add player.'
             }
-            return make_response(jsonify(response)), 400
+            return make_response(jsonify(response)), 500
 
     def put(self, current_user, fantasy_team_id):
         player_id = request.json.get('player_id')
@@ -245,7 +245,7 @@ class PlayerFantasyTeamView(MethodView):
                 'status': 'fail',
                 'message': 'Failed to add player.'
             }
-            return make_response(jsonify(response)), 400
+            return make_response(jsonify(response)), 500
 
     def delete(self, current_user, fantasy_team_id):
         player_id = request.json.get('player_id')
@@ -268,7 +268,7 @@ class PlayerFantasyTeamView(MethodView):
                 'status': 'fail',
                 'message': 'Failed to add player.'
             }
-            return make_response(jsonify(response)), 400
+            return make_response(jsonify(response)), 500
 
 
 class CaptainView(MethodView):
@@ -305,7 +305,7 @@ class CaptainView(MethodView):
                 'status': 'fail',
                 'message': 'Player does not exist'
             }
-            return make_response(jsonify(response)), 400
+            return make_response(jsonify(response)), 404
 
         if player_id == fantasy_team.vice_captain:
             response = {
@@ -336,7 +336,7 @@ class CaptainView(MethodView):
                 'status': 'fail',
                 'message': 'Failed to add player as captain.'
             }
-            return make_response(jsonify(response)), 400
+            return make_response(jsonify(response)), 500
 
 
 class ViceCaptainView(MethodView):
@@ -373,7 +373,7 @@ class ViceCaptainView(MethodView):
                 'status': 'fail',
                 'message': 'Player does not exist'
             }
-            return make_response(jsonify(response)), 400
+            return make_response(jsonify(response)), 404
 
         if player not in fantasy_team.players:
             response = {
@@ -405,4 +405,4 @@ class ViceCaptainView(MethodView):
                 'status': 'fail',
                 'message': 'Failed to add player as vice captain.'
             }
-            return make_response(jsonify(response)), 400
+            return make_response(jsonify(response)), 500

@@ -14,7 +14,7 @@ class PlayersView(MethodView):
     """
 
     @token_required
-    def get(self, player_id=None):
+    def get(self, current_user, player_id=None):
         if player_id:
             player = Player.find_first(id=player_id)
             if not player:
@@ -22,7 +22,7 @@ class PlayersView(MethodView):
                     'status': 'fail',
                     'message': 'Player does not exist'
                 }
-                return make_response(jsonify(response)), 400
+                return make_response(jsonify(response)), 404
 
             player = [player.serialize()]
             add_jersey_to_player(player)
@@ -50,7 +50,7 @@ class PlayersView(MethodView):
 
     @token_required
     @admin_required
-    def post(self):
+    def post(self, current_user):
         kwargs = request.json
         team_id = request.json.get('team_id')
         name = request.json.get('name')
@@ -78,11 +78,11 @@ class PlayersView(MethodView):
                 'status': 'fail',
                 'message': 'Failed to add player.'
             }
-            return make_response(jsonify(response)), 400
+            return make_response(jsonify(response)), 500
 
     @token_required
     @admin_required
-    def put(self, player_id):
+    def put(self, current_user, player_id):
         try:
             kwargs = request.json
             kwargs.update({"id": player_id})
@@ -100,18 +100,18 @@ class PlayersView(MethodView):
                 'status': 'Fail',
                 'message': 'player does not exist'
             }
-            return make_response(jsonify(response)), 400
+            return make_response(jsonify(response)), 404
         except Exception as e:
             logging.error(f"An error has occurred  {e}")
             response = {
                 'status': 'fail',
                 'message': 'Failed to update player.'
             }
-            return make_response(jsonify(response)), 400
+            return make_response(jsonify(response)), 500
 
     @token_required
     @admin_required
-    def delete(self, player_id):
+    def delete(self, current_user, player_id):
         try:
             player = Player.find_first(id=player_id)
             if player:
@@ -126,11 +126,11 @@ class PlayersView(MethodView):
                 'status': 'Fail',
                 'message': 'player does not exist'
             }
-            return make_response(jsonify(response)), 400
+            return make_response(jsonify(response)), 404
         except Exception as e:
             logging.error(f"An error has occurred  {e}")
             response = {
                 'status': 'fail',
                 'message': 'Failed to delete player.'
             }
-            return make_response(jsonify(response)), 400
+            return make_response(jsonify(response)), 500

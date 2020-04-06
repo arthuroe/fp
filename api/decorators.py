@@ -49,15 +49,15 @@ def admin_required(f):
     @wraps(f)
     def decorated(current_user, *args, **kwargs):
         admin = current_user.is_admin
-        if roles:
-            return f(*args, **kwargs)
+        if admin:
+            return f(current_user, *args, **kwargs)
 
-        response = jsonify({
-            "status": "fail",
-            "data": {
-                "message": "You are not authorized to carry out this operation",
+        response = jsonify(
+            {
+                "status": "fail",
+                "message": "You are not authorized to carry out this operation"
             }
-        })
+        )
         response.status_code = 401
         return response
 

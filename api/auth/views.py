@@ -150,6 +150,7 @@ class UserView(MethodView):
                 "is_admin": user.is_admin,
                 "name": user.name,
                 "photo": user.photo,
+                "fantasy_team_id": user.fantasy_team.all()[0].id
             }
             response = {
                 'status': 'success',

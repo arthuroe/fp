@@ -143,6 +143,10 @@ class UserView(MethodView):
                 }
                 return make_response(jsonify(response)), 400
 
+            fantasy_team_players_added = False
+            if user.fantasy_team.all()[0].players:
+                fantasy_team_players_added = True
+
             user = {
                 "email": user.email,
                 "fantasy_team_created": user.fantasy_team_created,
@@ -150,7 +154,8 @@ class UserView(MethodView):
                 "is_admin": user.is_admin,
                 "name": user.name,
                 "photo": user.photo,
-                "fantasy_team_id": user.fantasy_team.all()[0].id
+                "fantasy_team_id": user.fantasy_team.all()[0].id,
+                "fantasy_team_players_added": fantasy_team_players_added
             }
             response = {
                 'status': 'success',

@@ -105,8 +105,9 @@ class FantasyTeamView(MethodView):
             return make_response(jsonify(response)), 500
 
     def put(self, current_user, fantasy_team_id):
-        user_id = current_user.id
-        name = request.json.get('name')
+        kwargs = request.json
+        kwargs.update({"id": fantasy_team_id})
+        name = kwargs.get('name')
         try:
             duplicate_fantasy_teams = FantasyTeam.find_first(name=name)
 
@@ -118,7 +119,7 @@ class FantasyTeamView(MethodView):
                 return make_response(jsonify(response)), 209
 
             fantasy_team = FantasyTeam.find_first(id=fantasy_team_id)
-            fantasy_team.name = name
+            fantasy_team.update(**kwargs)
             fantasy_team.save()
             response = {
                 'status': 'success',
@@ -130,7 +131,7 @@ class FantasyTeamView(MethodView):
             logging.error(f"An error has occurred  {e}")
             response = {
                 'status': 'fail',
-                'message': 'Failed to add player.'
+                'message': 'Failed to update fantasy team.'
             }
             return make_response(jsonify(response)), 500
 

@@ -108,7 +108,7 @@ class FantasyTeamView(MethodView):
         user_id = current_user.id
         name = request.json.get('name')
         try:
-            duplicate_fantasy_teams = FantasyTeam.find_first(user_id=user_id)
+            duplicate_fantasy_teams = FantasyTeam.find_first(name=name)
 
             if duplicate_fantasy_teams:
                 response = {

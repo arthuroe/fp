@@ -19,7 +19,7 @@ class FixturesView(MethodView):
             if not game_week_id:
                 response = {
                     'status': 'fail',
-                    'message': 'GameWeek does not exist'
+                    'message': 'Fixture does not exist'
                 }
                 return make_response(jsonify(response)), 404
             response = {

@@ -7,6 +7,6 @@ fixtures_view = FixturesView.as_view('fixtures_api')
 fixtures_blueprint.add_url_rule(
     '/fixtures', view_func=fixtures_view, methods=['GET'])
 fixtures_blueprint.add_url_rule(
-    '/fixtures/<season_id>', view_func=fixtures_view, methods=['GET', 'POST'])
+    '/fixtures/<game_week_id>', view_func=fixtures_view, methods=['GET', 'POST'])
 fixtures_blueprint.add_url_rule(
     '/fixtures/<fixture_id>', view_func=fixtures_view, methods=['PUT', 'DELETE'])

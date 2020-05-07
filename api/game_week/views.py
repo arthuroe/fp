@@ -36,7 +36,7 @@ class GameWeekView(MethodView):
             if not season_id:
                 response = {
                     'status': 'fail',
-                    'message': 'Season does not exist'
+                    'message': 'GameWeek does not exist'
                 }
                 return make_response(jsonify(response)), 404
 
@@ -104,7 +104,7 @@ class GameWeekView(MethodView):
 
             response = {
                 'status': 'Fail',
-                'message': 'player does not exist'
+                'message': 'GameWeek does not exist'
             }
             return make_response(jsonify(response)), 404
         except Exception as e:
@@ -132,7 +132,7 @@ class GameWeekView(MethodView):
 
             response = {
                 'status': 'Fail',
-                'message': 'player does not exist'
+                'message': 'GameWeek does not exist'
             }
             return make_response(jsonify(response)), 404
         except Exception as e:

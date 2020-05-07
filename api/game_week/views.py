@@ -4,7 +4,7 @@ from flask import request, make_response, jsonify
 from flask.views import MethodView
 
 from api.decorators import admin_required, token_required
-from api.models import GameWeek
+from api.models import GameWeek, Season
 
 
 class GameWeekView(MethodView):
@@ -13,7 +13,15 @@ class GameWeekView(MethodView):
     """
 
     @token_required
-    def get(self, season_id, game_week_id=None):
+    def get(self, current_user, season_id, game_week_id=None):
+        season = Season.find_first(id=season_id)
+        if not season:
+            response = {
+                'status': 'fail',
+                'message': 'Season does not exist'
+            }
+            return make_response(jsonify(response)), 404
+
         if game_week_id:
             game_week = GameWeek.find_first(
                 id=game_week_id, season_id=season_id)
@@ -33,13 +41,6 @@ class GameWeekView(MethodView):
 
         if season_id and not game_week_id:
             game_weeks = GameWeek.filter_by(season_id=season_id).all()
-            if not season_id:
-                response = {
-                    'status': 'fail',
-                    'message': 'GameWeek does not exist'
-                }
-                return make_response(jsonify(response)), 404
-
             if not game_weeks:
                 response = {
                     'status': 'success',
@@ -62,7 +63,7 @@ class GameWeekView(MethodView):
 
     @token_required
     @admin_required
-    def post(self, season_id):
+    def post(self, current_user, season_id):
         kwargs = request.json
         kwargs.update({"season_id": season_id})
         try:
@@ -84,16 +85,15 @@ class GameWeekView(MethodView):
 
     @token_required
     @admin_required
-    def put(self, game_week_id):
-        kwargs = request.json()
-        kwargs.update({"season_id": season_id, "id": game_week_id})
+    def put(self, current_user, game_week_id):
+        kwargs = request.json
+        kwargs.update({"id": game_week_id})
 
         try:
             game_week = GameWeek.find_first(id=game_week_id)
 
-            if gameweek:
+            if game_week:
                 game_week.update(**kwargs)
-
                 response = {
                     'status': 'success',
                     'message': f'Successfully updated {game_week.date} gameweek.'
@@ -115,11 +115,10 @@ class GameWeekView(MethodView):
 
     @token_required
     @admin_required
-    def delete(self, game_week_id):
+    def delete(self, current_user, game_week_id):
         try:
             game_week = GameWeek.find_first(id=game_week_id)
-
-            if gameweek:
+            if game_week:
                 game_week.delete()
 
                 response = {

@@ -6,7 +6,7 @@ from flask.views import MethodView
 from .helpers import check_max_players_from_team
 from api.players.helpers import add_jersey_to_player
 from api.decorators import token_required, admin_required
-from api.models import FantasyTeam, Player, User
+from api.models import FantasyTeam, Player, User, FantasyTeamPlayers
 
 
 class FantasyTeamView(MethodView):
@@ -407,3 +407,28 @@ class ViceCaptainView(MethodView):
                 'message': 'Failed to add player as vice captain.'
             }
             return make_response(jsonify(response)), 500
+
+
+class StartingPlayersView(MethodView):
+    """
+    View to handle Fantasy Team starting eleven
+    """
+    decorators = [token_required]
+
+    def get(self, current_user):
+        fantasy_team = FantasyTeam.find_first(user_id=current_user.id)
+        starting_players = FantasyTeamPlayers.filter_by(
+            fantasyteam_id=fantasy_team.id, is_sub=False).all()
+        subs = FantasyTeamPlayers.filter_by(
+            fantasyteam_id=fantasy_team.id, is_sub=True).all()
+
+        response = {
+            'status': 'success',
+            'starting_players': [
+                player.serialize() for player in starting_players],
+            'subs': [player.serialize() for player in subs]
+        }
+        return make_response(jsonify(response)), 200
+
+    def post(self, current_user):
+        pass

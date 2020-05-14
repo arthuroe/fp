@@ -15,6 +15,6 @@ class Player(ModelMixin):
     points = db.Column(db.Integer)
     availability = db.Column(db.String(180))
     fantasy_teams = db.relationship(
-        'FantasyTeam', secondary='fantasyteam_players', backref='players',
+        'FantasyTeam', secondary='fantasy_team_players', backref='players',
         lazy='dynamic'
     )

@@ -11,8 +11,10 @@ install:
   - pip install -r requirements.txt
 
 services:
+  - postgresql
 
 before_script:
+  - psql -c 'create database fantasy_rugby_test;' -U postgres
 
 script:
  - pytest -v --cov .

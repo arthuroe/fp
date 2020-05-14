@@ -417,8 +417,10 @@ class StartingPlayersView(MethodView):
 
     def get(self, current_user):
         fantasy_team = FantasyTeam.find_first(user_id=current_user.id)
+
         starting_players = FantasyTeamPlayers.filter_by(
             fantasyteam_id=fantasy_team.id, is_sub=False).all()
+
         subs = FantasyTeamPlayers.filter_by(
             fantasyteam_id=fantasy_team.id, is_sub=True).all()
 
@@ -431,4 +433,35 @@ class StartingPlayersView(MethodView):
         return make_response(jsonify(response)), 200
 
     def post(self, current_user):
-        pass
+        kwargs = request.json
+        players = kwargs.get('players')
+
+        fantasy_team = FantasyTeam.find_first(user_id=current_user.id)
+
+        if not fantasy_team.players:
+            response = {
+                'status': 'success',
+                'message': 'No players added to fantasy team.'
+            }
+            return make_response(jsonify(response)), 400
+
+        for player in players:
+            fantasy_team_player = FantasyTeamPlayers.find_first(
+                player_id=player.get('id'))
+
+            if player.get('is_captain'):
+                fantasy_team_player.is_captain = True
+
+            if player.get('is_vice_captain'):
+                fantasy_team_player.is_vice_captain = True
+
+            if player.get('is_sub'):
+                fantasy_team_player.is_sub = True
+
+            fantasy_team_player.save()
+
+        response = {
+            'status': 'success',
+            'message': 'Saved fantasy team.'
+        }
+        return make_response(jsonify(response)), 201

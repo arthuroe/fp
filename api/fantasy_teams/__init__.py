@@ -1,7 +1,8 @@
 from flask import Blueprint
 
 from .views import (
-    FantasyTeamView, PlayerFantasyTeamView, CaptainView, ViceCaptainView
+    FantasyTeamView, PlayerFantasyTeamView, CaptainView, ViceCaptainView,
+    StartingPlayersView
 )
 
 fantasy_team_blueprint = Blueprint(
@@ -36,5 +37,13 @@ fantasy_team_vice_captain_view = ViceCaptainView.as_view(
 fantasy_team_blueprint.add_url_rule(
     '/fantasy_team_vice_captain',
     view_func=fantasy_team_vice_captain_view,
+    methods=['GET', 'POST']
+)
+
+starting_players_view = StartingPlayersView.as_view(
+    'starting_players_api')
+fantasy_team_blueprint.add_url_rule(
+    '/starting_players',
+    view_func=starting_players_view,
     methods=['GET', 'POST']
 )

@@ -436,32 +436,77 @@ class StartingPlayersView(MethodView):
         kwargs = request.json
         players = kwargs.get('players')
 
-        fantasy_team = FantasyTeam.find_first(user_id=current_user.id)
+        try:
+            fantasy_team = FantasyTeam.find_first(user_id=current_user.id)
 
-        if not fantasy_team.players:
+            if not fantasy_team.players:
+                response = {
+                    'status': 'fail',
+                    'message': 'No players added to fantasy team.'
+                }
+                return make_response(jsonify(response)), 400
+
+            for player in players:
+                fantasy_team_player = FantasyTeamPlayers.find_first(
+                    fantasyteam_id=fantasy_team.id, player_id=player.get('id'))
+
+                if player.get('is_captain'):
+                    fantasy_team_player.is_captain = True
+
+                if player.get('is_vice_captain'):
+                    fantasy_team_player.is_vice_captain = True
+
+                if player.get('is_sub'):
+                    fantasy_team_player.is_sub = True
+
+                fantasy_team_player.save()
+
             response = {
                 'status': 'success',
-                'message': 'No players added to fantasy team.'
+                'message': 'Saved fantasy team.'
+            }
+            return make_response(jsonify(response)), 201
+        except Exception as e:
+            logging.error(f"An error has occurred  {e}")
+            response = {
+                'status': 'fail',
+                'message': 'Failed to submit players.'
+            }
+            return make_response(jsonify(response)), 500
+
+    def put(self, current_user):
+        kwargs = request.json
+        player_to_start = kwargs.get('player_to_start')
+        player_to_sub = kwargs.get('player_to_sub')
+
+        if not all([player_to_start, player_to_sub]):
+            response = {
+                'status': 'fail',
+                'message': 'Provide player to substitute and substitute'
             }
             return make_response(jsonify(response)), 400
 
-        for player in players:
-            fantasy_team_player = FantasyTeamPlayers.find_first(
-                player_id=player.get('id'))
+        try:
+            fantasy_team = FantasyTeam.find_first(user_id=current_user.id)
+            player_to_start = FantasyTeamPlayers.find_first(
+                fantasyteam_id=fantasy_team.id, player_id=player_to_start)
+            player_to_start.is_sub = False
+            player_to_start.save()
 
-            if player.get('is_captain'):
-                fantasy_team_player.is_captain = True
+            player_to_sub = FantasyTeamPlayers.find_first(
+                fantasyteam_id=fantasy_team.id, player_id=player_to_sub)
+            player_to_sub.is_sub = True
+            player_to_sub.save()
 
-            if player.get('is_vice_captain'):
-                fantasy_team_player.is_vice_captain = True
-
-            if player.get('is_sub'):
-                fantasy_team_player.is_sub = True
-
-            fantasy_team_player.save()
-
-        response = {
-            'status': 'success',
-            'message': 'Saved fantasy team.'
-        }
-        return make_response(jsonify(response)), 201
+            response = {
+                'status': 'success',
+                'message': 'Successfully substituted player.'
+            }
+            return make_response(jsonify(response)), 201
+        except Exception as e:
+            logging.error(f"An error has occurred  {e}")
+            response = {
+                'status': 'fail',
+                'message': 'Failed to substitute player.'
+            }
+            return make_response(jsonify(response)), 500

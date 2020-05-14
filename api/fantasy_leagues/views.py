@@ -52,7 +52,7 @@ class FantasyLeagueView(MethodView):
             return make_response(jsonify(response)), 400
 
         try:
-            fantasy_league = FantasyLeague(name=name)
+            fantasy_league = FantasyLeague(**post_data)
             fantasy_league.save()
             response = {
                 'status': 'success',

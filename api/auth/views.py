@@ -38,10 +38,10 @@ class RegisterView(MethodView):
             }
             return make_response(jsonify(response)), 400
 
-        user = User.find_first(email=post_data.get('email'))
+        user = User.find_first(email=email)
         if not user:
             try:
-                user = User(email=email, password=password, name=name)
+                user = User(**post_data)
                 user.save()
 
                 auth_token = user.generate_token(user.id)

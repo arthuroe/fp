@@ -38,17 +38,15 @@ class RegisterView(MethodView):
             }
             return make_response(jsonify(response)), 400
 
-        user = User.find_first(email=email)
+        user = User.find_first(email=post_data.get('email'))
         if not user:
             try:
-                user = User(**post_data)
+                user = User(email=email, password=password, name=name)
                 user.save()
 
-                auth_token = user.generate_token(user.id)
                 response = {
                     'status': 'success',
-                    'message': 'Successfully registered.',
-                    'auth_token': auth_token.decode()
+                    'message': 'Successfully registered.'
                 }
                 return make_response(jsonify(response)), 201
             except Exception as e:
@@ -122,54 +120,3 @@ class LoginView(MethodView):
                 'message': 'An error has occurred. Please try again.'
             }
             return make_response(jsonify(response)), 500
-
-
-class UserView(MethodView):
-    """
-    View to handle user and details
-    """
-    decorators = [token_required]
-
-    def get(self, current_user):
-        user_id = current_user.id
-
-        try:
-            user = User.find_first(id=user_id)
-
-            if not user:
-                response = {
-                    'status': 'fail',
-                    'message': 'User does not exist.'
-                }
-                return make_response(jsonify(response)), 400
-
-            fantasy_team_players_added = False
-            fantasy_team_id = None
-
-            if user.fantasy_team.all():
-                fantasy_team = user.fantasy_team.all()[0]
-                fantasy_team_id = fantasy_team.id
-                fantasy_team_players_added = True if fantasy_team.players else False
-
-            user = {
-                "email": user.email,
-                "fantasy_team_created": user.fantasy_team_created,
-                "id": user.id,
-                "is_admin": user.is_admin,
-                "name": user.name,
-                "photo": user.photo,
-                "fantasy_team_id": fantasy_team_id,
-                "fantasy_team_players_added": fantasy_team_players_added
-            }
-            response = {
-                'status': 'success',
-                'user': user
-            }
-            return make_response(jsonify(response)), 200
-        except Exception as e:
-            logging.error(f"An error has occurred  {e}")
-            response = {
-                'status': 'fail',
-                'message': 'Failed to retrieve user.'
-            }
-            return make_response(jsonify(response)), 400

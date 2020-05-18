@@ -11,6 +11,7 @@ from .fixtures import Fixture
 from .game_week import GameWeek
 from .pivot_tables import *
 from .players import Player
+from .player_gameweek import PlayerGameWeek
 from .season import Season
 from .team import Team
 from .user import User

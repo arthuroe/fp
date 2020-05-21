@@ -18,3 +18,7 @@ class Player(ModelMixin):
         'FantasyTeam', secondary='fantasy_team_players', backref='players',
         lazy='dynamic'
     )
+    gameweek_stats = db.relationship(
+        'GameWeek', secondary='player_gameweeks', backref='player_stats',
+        lazy='dynamic'
+    )

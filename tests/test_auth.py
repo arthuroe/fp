@@ -14,7 +14,6 @@ class TestAuth(BaseTestCase):
         data = json.loads(response.data.decode())
         self.assertTrue(data['status'] == 'success')
         self.assertTrue(data['message'] == 'Successfully registered.')
-        self.assertTrue(data['auth_token'])
         self.assertEqual(response.status_code, 201)
 
     def test_registration_with_already_registered_email(self):

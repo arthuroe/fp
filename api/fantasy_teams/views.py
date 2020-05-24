@@ -3,7 +3,7 @@ import logging
 from flask import request, make_response, jsonify
 from flask.views import MethodView
 
-from .helpers import check_max_players_from_team
+from .helpers import check_max_players_from_team, add_player_info
 from api.players.helpers import add_jersey_to_player
 from api.decorators import token_required, admin_required
 from api.models import FantasyTeam, Player, User, FantasyTeamPlayers
@@ -160,11 +160,22 @@ class PlayerFantasyTeamView(MethodView):
             }
             return make_response(jsonify(response)), 200
 
-        players = [player.serialize() for player in players]
-        add_jersey_to_player(players)
+        starting_players = FantasyTeamPlayers.filter_by(
+            fantasyteam_id=fantasy_team.id, is_sub=False).all()
+
+        subs = FantasyTeamPlayers.filter_by(
+            fantasyteam_id=fantasy_team.id, is_sub=True).all()
+
+        starting_players = [player.serialize() for player in starting_players]
+        add_player_info(starting_players)
+
+        subs = [player.serialize() for player in subs]
+        add_player_info(subs)
+
         response = {
             'status': 'success',
-            'players': players
+            'starting_players': starting_players,
+            'subs': subs
         }
         return make_response(jsonify(response)), 200
 

@@ -426,23 +426,6 @@ class StartingPlayersView(MethodView):
     """
     decorators = [token_required]
 
-    def get(self, current_user):
-        fantasy_team = FantasyTeam.find_first(user_id=current_user.id)
-
-        starting_players = FantasyTeamPlayers.filter_by(
-            fantasyteam_id=fantasy_team.id, is_sub=False).all()
-
-        subs = FantasyTeamPlayers.filter_by(
-            fantasyteam_id=fantasy_team.id, is_sub=True).all()
-
-        response = {
-            'status': 'success',
-            'starting_players': [
-                player.serialize() for player in starting_players],
-            'subs': [player.serialize() for player in subs]
-        }
-        return make_response(jsonify(response)), 200
-
     def post(self, current_user):
         kwargs = request.json
         players = kwargs.get('players')

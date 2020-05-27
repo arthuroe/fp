@@ -3,6 +3,7 @@ import logging
 from flask import request, make_response, jsonify
 from flask.views import MethodView
 
+from .helpers import award_points
 from api.decorators import admin_required, token_required
 from api.models import PlayerGameWeek
 
@@ -12,6 +13,7 @@ class GameWeekStatsView(MethodView):
     View to handle GameWeek stats
     """
 
+    @token_required
     def get(self, current_user, game_week_id, player_id=None):
         if not game_week_id:
             response = {
@@ -37,8 +39,27 @@ class GameWeekStatsView(MethodView):
         }
         return make_response(jsonify(response)), 200
 
-    def post(self):
-        pass
+    @token_required
+    def post(self, current_user, game_week_id, player_id):
+        kwargs = request.json
+        kwargs.update({"game_week_id": game_week_id, "player_id": player_id})
+
+        try:
+            gameweek_stats = PlayerGameWeek(**kwargs)
+            gameweek_stats.gameweek_points = award_points(**kwargs)
+            gameweek_stats.save()
+            response = {
+                'status': 'success',
+                'stats': gameweek_stats.serialize()
+            }
+            return make_response(jsonify(response)), 201
+        except Exception as e:
+            logging.error(f"An error has occurred  {e}")
+            response = {
+                'status': 'fail',
+                'message': 'Failed to add gameweek stats.'
+            }
+            return make_response(jsonify(response)), 500
 
     def put(self):
         pass

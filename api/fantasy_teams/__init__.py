@@ -45,5 +45,5 @@ starting_players_view = StartingPlayersView.as_view(
 fantasy_team_blueprint.add_url_rule(
     '/starting_players',
     view_func=starting_players_view,
-    methods=['GET', 'POST', 'PUT']
+    methods=['POST', 'PUT']
 )

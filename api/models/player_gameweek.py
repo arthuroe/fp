@@ -12,8 +12,8 @@ class PlayerGameWeek(ModelMixin):
     player_id = db.Column(db.Integer, db.ForeignKey(
         'players.id'), nullable=False)
     minutes_played = db.Column(db.Integer, default=0)
-    yellow_cards = db.Column(db.Boolean, default=False)
-    red_cards = db.Column(db.Boolean, default=False)
+    yellow_card = db.Column(db.Boolean, default=False)
+    red_card = db.Column(db.Boolean, default=False)
     tries = db.Column(db.Integer, default=0)
     conversions = db.Column(db.Integer, default=0)
     starting_appearance = db.Column(db.Boolean, default=False)
@@ -22,3 +22,4 @@ class PlayerGameWeek(ModelMixin):
     drop_goals = db.Column(db.Integer, default=0)
     penalty_kicks = db.Column(db.Integer, default=0)
     man_of_the_match = db.Column(db.Boolean, default=False)
+    gameweek_points = db.Column(db.Integer, default=0)

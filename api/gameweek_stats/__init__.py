@@ -11,5 +11,5 @@ gameweek_stats_blueprint.add_url_rule(
 )
 gameweek_stats_blueprint.add_url_rule(
     '/gameweek_stats/<game_week_id>/<player_id>', view_func=gameweek_stats_view,
-    methods=['GET', 'POST']
+    methods=['GET', 'POST', 'PUT']
 )

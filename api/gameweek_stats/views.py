@@ -5,7 +5,7 @@ from flask.views import MethodView
 
 from .helpers import award_points
 from api.decorators import admin_required, token_required
-from api.models import PlayerGameWeek
+from api.models import PlayerGameWeek, GameWeek
 
 
 class GameWeekStatsView(MethodView):
@@ -15,7 +15,7 @@ class GameWeekStatsView(MethodView):
 
     @token_required
     def get(self, current_user, game_week_id, player_id=None):
-        gameweek = GameWeek.find_first(id=game_week_id)
+        game_week = GameWeek.find_first(id=game_week_id)
         if not game_week:
             response = {
                 'status': 'fail',
@@ -102,5 +102,23 @@ class GameWeekStatsView(MethodView):
 
     @token_required
     @admin_required
-    def delete(self):
-        pass
+    def delete(self, current_user, game_week_id, player_id):
+        try:
+            stats = PlayerGameWeek.filter_by(
+                player_id=player_id, game_week_id=game_week_id).all()[0]
+
+            stat_id = stats.id
+            stat = PlayerGameWeek.find_first(id=stat_id)
+            stat.delete()
+            response = {
+                'status': 'success',
+                'message': 'Successfully deleted player stats'
+            }
+            return make_response(jsonify(response)), 201
+        except Exception as e:
+            logging.error(f"An error has occurred  {e}")
+            response = {
+                'status': 'fail',
+                'message': 'Failed to update gameweek stats.'
+            }
+            return make_response(jsonify(response)), 500

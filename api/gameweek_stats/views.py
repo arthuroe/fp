@@ -15,7 +15,8 @@ class GameWeekStatsView(MethodView):
 
     @token_required
     def get(self, current_user, game_week_id, player_id=None):
-        if not game_week_id:
+        gameweek = GameWeek.find_first(id=game_week_id)
+        if not game_week:
             response = {
                 'status': 'fail',
                 'message': 'GameWeek does not exist'
@@ -40,11 +41,22 @@ class GameWeekStatsView(MethodView):
         return make_response(jsonify(response)), 200
 
     @token_required
+    @admin_required
     def post(self, current_user, game_week_id, player_id):
         kwargs = request.json
         kwargs.update({"game_week_id": game_week_id, "player_id": player_id})
 
         try:
+            check_gameweek_stats_exist = PlayerGameWeek.filter_by(
+                player_id=player_id, game_week_id=game_week_id).all()
+
+            if check_gameweek_stats_exist:
+                response = {
+                    'status': 'fail',
+                    'Message': 'Stats already added, please update exsiting stats.'
+                }
+                return make_response(jsonify(response)), 400
+
             gameweek_stats = PlayerGameWeek(**kwargs)
             gameweek_stats.gameweek_points = award_points(**kwargs)
             gameweek_stats.save()
@@ -61,8 +73,34 @@ class GameWeekStatsView(MethodView):
             }
             return make_response(jsonify(response)), 500
 
-    def put(self):
-        pass
+    @token_required
+    @admin_required
+    def put(self, current_user, game_week_id, player_id):
+        kwargs = request.json
+        kwargs.update({"game_week_id": game_week_id, "player_id": player_id})
 
+        try:
+            stats = PlayerGameWeek.filter_by(
+                player_id=player_id, game_week_id=game_week_id).all()[0]
+
+            stat_id = stats.id
+            stat = PlayerGameWeek.find_first(id=stat_id)
+            stat.update(**kwargs)
+            stat.gameweek_points = award_points(**kwargs)
+            response = {
+                'status': 'success',
+                'stats': stat.serialize()
+            }
+            return make_response(jsonify(response)), 201
+        except Exception as e:
+            logging.error(f"An error has occurred  {e}")
+            response = {
+                'status': 'fail',
+                'message': 'Failed to update gameweek stats.'
+            }
+            return make_response(jsonify(response)), 500
+
+    @token_required
+    @admin_required
     def delete(self):
         pass

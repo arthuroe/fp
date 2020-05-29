@@ -1,5 +1,10 @@
+from api.models import Player
+
+
 def award_points(**kwargs):
     points = 0
+    if kwargs.get('tries'):
+        points += award_try_points(**kwargs)
     if kwargs.get('starting_appearance'):
         points += 2
     if kwargs.get('sub_appearance'):
@@ -22,3 +27,10 @@ def award_points(**kwargs):
     if kwargs.get('red_card'):
         points -= 5
     return points
+
+
+def award_try_points(**kwargs):
+    player = Player.find_first(id=kwargs.get('player_id'))
+    if player.position in ['FR', 'SR', 'BR']:
+        return kwargs.get('tries') * 6
+    return kwargs.get('tries') * 4

@@ -16,12 +16,20 @@ class User(ModelMixin):
 
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(120), nullable=False)
-    name = db.Column(db.String(120), nullable=False)
+    first_name = db.Column(db.String(120), nullable=False)
+    last_name = db.Column(db.String(120), nullable=False)
+    gender = db.Column(db.String(120), nullable=False)
+    phone_number = db.Column(db.String(120), nullable=False)
+    receive_club_notifications = db.Column(db.Boolean, default=False)
     is_admin = db.Column(db.Boolean, default=False)
     photo = db.Column(db.String(180))
     fantasy_team_created = db.Column(db.Boolean, default=False)
     fantasy_team = db.relationship(
         'FantasyTeam', backref='user', lazy='dynamic')
+    favorite_clubs = db.relationship(
+        "Team", secondary="user_teams", backref='users_following',
+        lazy="dynamic"
+    )
 
     def __init__(self, email, password, name):
         """

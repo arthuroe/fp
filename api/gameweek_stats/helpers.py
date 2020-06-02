@@ -1,4 +1,4 @@
-from api.models import Player
+from api.models import Player, PlayerGameWeek
 
 
 def award_points(**kwargs):
@@ -34,3 +34,13 @@ def award_try_points(**kwargs):
     if player.position in ['FR', 'SR', 'BR']:
         return kwargs.get('tries') * 6
     return kwargs.get('tries') * 4
+
+
+def get_fantasy_player_stats(fantasy_team_players, game_week_id):
+    player_stats = []
+    team_points = 0
+    for fantasy_team_player in fantasy_team_players:
+        player = PlayerGameWeek.filter_by(
+            player_id=fantasy_team_player.id, game_week_id=game_week_id).all()
+        player_stats.append(player[0].serialize())
+    return player_stats

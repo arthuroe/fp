@@ -3,9 +3,9 @@ import logging
 from flask import request, make_response, jsonify
 from flask.views import MethodView
 
-from .helpers import award_points
+from .helpers import award_points, get_fantasy_player_stats
 from api.decorators import admin_required, token_required
-from api.models import PlayerGameWeek, GameWeek
+from api.models import PlayerGameWeek, GameWeek, FantasyTeam
 
 
 class GameWeekStatsView(MethodView):
@@ -14,7 +14,9 @@ class GameWeekStatsView(MethodView):
     """
 
     @token_required
-    def get(self, current_user, game_week_id, player_id=None):
+    def get(
+        self, current_user, game_week_id, player_id=None, fantasy_team_id=None
+    ):
         game_week = GameWeek.find_first(id=game_week_id)
         if not game_week:
             response = {
@@ -22,6 +24,18 @@ class GameWeekStatsView(MethodView):
                 'message': 'GameWeek does not exist'
             }
             return make_response(jsonify(response)), 404
+
+        if fantasy_team_id:
+            fantasy_team = FantasyTeam.find_first(id=fantasy_team_id)
+            fantasy_team_players = fantasy_team.players
+            fantasy_team_player_stats = get_fantasy_player_stats(
+                fantasy_team_players, game_week_id)
+
+            response = {
+                'status': 'success',
+                'fantasy_team_stats': fantasy_team_player_stats
+            }
+            return make_response(jsonify(response)), 200
 
         if player_id:
             player_stats = PlayerGameWeek.filter_by(

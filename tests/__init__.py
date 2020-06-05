@@ -24,11 +24,11 @@ class BaseTestCase(TestCase):
         db.session.remove()
         db.drop_all()
 
-    def register_user(self, email=None, password=None, name=None, role=False):
+    def register_user(self, email=None, password=None, first_name=None, is_admin=False):
         return self.client.post(
             '/api/v1/auth/register',
             data=json.dumps(
-                dict(email=email, password=password, name=name)),
+                dict(email=email, password=password, first_name=first_name)),
             content_type='application/json',
         )
 
@@ -41,5 +41,5 @@ class BaseTestCase(TestCase):
 
     def create_user(self):
         user = User(email='test@gmail.com',
-                    password='tesTing123', name='test')
+                    password='tesTing123', first_name='test')
         user.save()

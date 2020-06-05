@@ -2,6 +2,7 @@ import os
 
 from flask import Flask
 from flask_cors import CORS
+from flask_mail import Mail
 
 from config import app_configuration
 
@@ -10,6 +11,7 @@ app = Flask(__name__)
 environment = os.getenv("APP_SETTINGS")
 os.sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 app.config.from_object(app_configuration[environment])
+mail = Mail(app)
 
 from api.models import db
 from api.auth import auth_blueprint

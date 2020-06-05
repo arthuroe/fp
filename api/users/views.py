@@ -145,15 +145,23 @@ class UserView(MethodView):
 
             fantasy_team_players_added = False
             fantasy_team_id = None
+            favorite_clubs = []
 
             if user.fantasy_team.all():
                 fantasy_team = user.fantasy_team.all()[0]
                 fantasy_team_id = fantasy_team.id
                 fantasy_team_players_added = True if fantasy_team.players else False
 
+            if user.favorite_clubs.all():
+                favorite_clubs = [
+                    favorite_club.serialize()
+                    for favorite_club in user.favorite_clubs.all()
+                ]
+
             user = {
                 "email": user.email,
                 "fantasy_team_created": user.fantasy_team_created,
+                "uuid": user.uuid,
                 "id": user.id,
                 "is_admin": user.is_admin,
                 "first_name": user.first_name,
@@ -163,7 +171,8 @@ class UserView(MethodView):
                 "receive_club_notifications": user.receive_club_notifications,
                 "photo": user.photo,
                 "fantasy_team_id": fantasy_team_id,
-                "fantasy_team_players_added": fantasy_team_players_added
+                "fantasy_team_players_added": fantasy_team_players_added,
+                "favorite_clubs": favorite_clubs
             }
             response = {
                 'status': 'success',

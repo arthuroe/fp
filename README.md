@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/arthuroe/fp.svg?branch=develop)](https://travis-ci.org/arthuroe/fp)
+[![Build Status](https://travis-ci.com/arthuroe/fp.svg?token=UkY1KBXLvhKhX8CgS2Jn&branch=develop)](https://travis-ci.com/arthuroe/fp)
 
 ### Fantasy Rugby
 

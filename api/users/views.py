@@ -88,7 +88,7 @@ class ManageUserView(MethodView):
                     'status': 'fail',
                     'message': 'Registration failed. Please try again.'
                 }
-                return make_response(jsonify(response)), 401
+                return make_response(jsonify(response)), 500
         else:
             response = {
                 'status': 'fail',
@@ -121,7 +121,7 @@ class ManageUserView(MethodView):
                 'status': 'fail',
                 'message': 'Delete failed. Please try again.'
             }
-            return make_response(jsonify(response)), 401
+            return make_response(jsonify(response)), 500
 
 
 class UserView(MethodView):
@@ -156,7 +156,11 @@ class UserView(MethodView):
                 "fantasy_team_created": user.fantasy_team_created,
                 "id": user.id,
                 "is_admin": user.is_admin,
-                "name": user.name,
+                "first_name": user.first_name,
+                "last_name": user.last_name,
+                "gender": user.gender,
+                "phone_number": user.phone_number,
+                "receive_club_notifications": user.receive_club_notifications,
                 "photo": user.photo,
                 "fantasy_team_id": fantasy_team_id,
                 "fantasy_team_players_added": fantasy_team_players_added
@@ -172,7 +176,7 @@ class UserView(MethodView):
                 'status': 'fail',
                 'message': 'Failed to retrieve user.'
             }
-            return make_response(jsonify(response)), 400
+            return make_response(jsonify(response)), 500
 
     def put(self, current_user, user_id):
         kwargs = request.json
@@ -185,7 +189,7 @@ class UserView(MethodView):
 
                 response = {
                     'status': 'success',
-                    'message': f'Successfully updated {user.name}.'
+                    'message': f'Successfully updated {user.first_name}.'
                 }
                 return make_response(jsonify(response)), 201
 

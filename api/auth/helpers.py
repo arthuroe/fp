@@ -1,8 +1,10 @@
+import logging
 import re
 
-from api import app
-
 from itsdangerous import URLSafeTimedSerializer
+
+from api import app
+from api.models import Team
 
 
 def validate_email(email):
@@ -40,3 +42,15 @@ def confirm_token(token, expiration=3600):
     except:
         return False
     return email
+
+
+def get_user_teams(teams):
+    try:
+        user_teams = []
+        for team in teams:
+            t = Team.find_first(id=team.get('id'))
+            user_teams.append(t)
+        return user_teams
+    except Exception as e:
+        logging.error(f"An error has occurred  {e}")
+        return []

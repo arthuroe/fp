@@ -45,6 +45,8 @@ class RegisterView(MethodView):
         if not user:
             try:
                 user = User(**post_data)
+                user_teams = get_user_teams(post_data.get('favorite_clubs'))
+                user.favorite_clubs.extend(user_teams)
                 user.save()
 
                 response = {

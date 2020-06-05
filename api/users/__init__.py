@@ -12,7 +12,7 @@ user_blueprint.add_url_rule(
 user_blueprint.add_url_rule(
     '/users/<user_id>',
     view_func=manage_user_view,
-    methods=['GET', 'DELETE']
+    methods=['GET', 'DELETE', 'PUT']
 )
 
 user_view = UserView.as_view('user_api')
@@ -22,7 +22,7 @@ user_blueprint.add_url_rule(
     methods=['GET']
 )
 user_blueprint.add_url_rule(
-    '/users/<user_id>',
+    '/users',
     view_func=user_view,
-    methods=['PUT']
+    methods=['GET']
 )

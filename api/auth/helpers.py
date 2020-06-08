@@ -45,6 +45,8 @@ def confirm_token(token, expiration=3600):
 
 
 def get_user_teams(teams):
+    if teams is None:
+        teams = []
     try:
         user_teams = []
         for team in teams:

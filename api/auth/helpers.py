@@ -23,7 +23,7 @@ def validate_password(password):
 
 
 def generate_reset_url(base_url, token):
-    return f"http://{base_url}/api/v1/auth/reset_password/{token}"
+    return f"https://{base_url}/api/v1/auth/reset_password/{token}"
 
 
 def generate_confirmation_token(email):

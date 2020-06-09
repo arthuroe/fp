@@ -79,7 +79,7 @@ class ManageUserView(MethodView):
 
                 response = {
                     'status': 'success',
-                    'message': f'Successfully Added {user.name}.'
+                    'message': f'Successfully Added {user.first_name}.'
                 }
                 return make_response(jsonify(response)), 201
             except Exception as e:
@@ -105,7 +105,7 @@ class ManageUserView(MethodView):
                 user.delete()
                 response = {
                     'status': 'success',
-                    'message': f'Successfully deleted {user.name}.'
+                    'message': f'Successfully deleted {user.first_name}.'
                 }
                 return make_response(jsonify(response)), 200
 

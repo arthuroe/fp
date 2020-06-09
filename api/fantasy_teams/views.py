@@ -430,6 +430,13 @@ class StartingPlayersView(MethodView):
         kwargs = request.json
         players = kwargs.get('players')
 
+        if not current_user.fantasy_team_created:
+            response = {
+                'status': 'fail',
+                'message': 'Please first create a fantasy_team'
+            }
+            return make_response(jsonify(response)), 400
+
         try:
             fantasy_team = FantasyTeam.find_first(user_id=current_user.id)
 
@@ -443,16 +450,10 @@ class StartingPlayersView(MethodView):
             for player in players:
                 fantasy_team_player = FantasyTeamPlayers.find_first(
                     fantasyteam_id=fantasy_team.id, player_id=player.get('id'))
-
-                if player.get('is_captain'):
-                    fantasy_team_player.is_captain = True
-
-                if player.get('is_vice_captain'):
-                    fantasy_team_player.is_vice_captain = True
-
-                if player.get('is_sub'):
-                    fantasy_team_player.is_sub = True
-
+                fantasy_team_player.is_captain = player.get('is_captain', False)
+                fantasy_team_player.is_vice_captain = player.get(
+                    'is_vice_captain', False)
+                fantasy_team_player.is_sub = player.get('is_sub', False)
                 fantasy_team_player.save()
 
             response = {

@@ -81,7 +81,7 @@ class FantasyTeamView(MethodView):
             if user.fantasy_team_created:
                 response = {
                     'status': 'fail',
-                    'message': f'Fantasy team already created for {user.name}.'
+                    'message': f'Fantasy team already created for {user.first_name}.'
                 }
                 return make_response(jsonify(response)), 209
 

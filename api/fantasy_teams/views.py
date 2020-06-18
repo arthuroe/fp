@@ -450,6 +450,11 @@ class StartingPlayersView(MethodView):
             for player in players:
                 fantasy_team_player = FantasyTeamPlayers.find_first(
                     fantasyteam_id=fantasy_team.id, player_id=player.get('id'))
+
+                if not fantasy_team_player:
+                    logging.error(f"Player not in Fantasy Team")
+                    continue
+
                 fantasy_team_player.is_captain = player.get('is_captain', False)
                 fantasy_team_player.is_vice_captain = player.get(
                     'is_vice_captain', False)
@@ -505,48 +510,3 @@ class StartingPlayersView(MethodView):
                 'message': 'Failed to substitute player.'
             }
             return make_response(jsonify(response)), 500
-
-
-class TeamOfWeekView(MethodView):
-    "View to handle team of the week"
-
-    def get(self):
-        forwards = []
-        centers = []
-        backs = []
-        team_of_the_week = []
-        players = Player.fetch_all()
-        for player in players:
-            if player.position == 'forwards':
-                forwards.append(player)
-
-            if player.position == 'centers':
-                forwards.append(player)
-
-            if player.position == 'backs':
-                forwards.append(player)
-
-        if forwards:
-            top_forwards = forwards[:3]
-            team_of_the_week.extend(top_forwards)
-
-        if centers:
-            centers = centers[:3]
-            team_of_the_week.extend(top_centers)
-
-        if backs:
-            backs = backs[:3]
-            team_of_the_week.extend(top_backs)
-
-        if team_of_the_week:
-            response = {
-                'status': 'success',
-                'team': [player.serialize() for player in team_of_the_week]
-            }
-            return make_response(jsonify(response)), 200
-
-        response = {
-            'status': 'success',
-            'team': 'No stats have been provided for this yet'
-        }
-        return make_response(jsonify(response)), 200

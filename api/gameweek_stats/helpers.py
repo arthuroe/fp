@@ -44,3 +44,10 @@ def get_fantasy_player_stats(fantasy_team_players, game_week_id):
             player_id=fantasy_team_player.id, game_week_id=game_week_id).all()
         player_stats.append(player[0].serialize())
     return player_stats
+
+
+def get_top_players_in_category(players, position, number_of_players):
+    players = players.join(PlayerGameWeek.player_info, aliased=True).filter_by(
+        position=position).order_by(
+        PlayerGameWeek.gameweek_points.desc()).limit(number_of_players).all()
+    return players

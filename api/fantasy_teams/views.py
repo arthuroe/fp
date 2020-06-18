@@ -209,7 +209,15 @@ class PlayerFantasyTeamView(MethodView):
                 }
                 return make_response(jsonify(response)), 400
 
+            if fantasy_team.money < player.price:
+                response = {
+                    'status': 'fail',
+                    'message': 'Not enough money to buy player'
+                }
+                return make_response(jsonify(response)), 400
+
             fantasy_team.players.append(player)
+            fantasy_team.money -= player.price
             fantasy_team.save()
             response = {
                 'status': 'success',
@@ -240,10 +248,22 @@ class PlayerFantasyTeamView(MethodView):
                     'message': 'Player already added.'
                 }
                 return make_response(jsonify(response)), 400
+
+            if (fantasy_team.money + current_player.price) < player.price:
+                response = {
+                    'status': 'fail',
+                    'message': 'Not enough money to buy player'
+                }
+                return make_response(jsonify(response)), 400
+
             players = fantasy_team.players
 
             fantasy_team.players.remove(current_player)
+            fantasy_team.money += current_player.price
+
             fantasy_team.players.append(player)
+            fantasy_team.money -= player.price
+
             fantasy_team.save()
             response = {
                 'status': 'success',
@@ -267,6 +287,7 @@ class PlayerFantasyTeamView(MethodView):
             player = Player.find_first(id=player_id)
 
             fantasy_team.players.remove(player)
+            fantasy_team.money += player.price
             fantasy_team.save()
             response = {
                 'status': 'success',

@@ -42,7 +42,8 @@ def get_fantasy_player_stats(fantasy_team_players, game_week_id):
     for fantasy_team_player in fantasy_team_players:
         player = PlayerGameWeek.filter_by(
             player_id=fantasy_team_player.id, game_week_id=game_week_id).all()
-        player_stats.append(player[0].serialize())
+        if player:
+            player_stats.append(player[0].serialize())
     return player_stats
 
 

@@ -9,7 +9,7 @@ from api.models import Season
 
 class SeasonsView(MethodView):
     """
-    View to handle Teams
+    View to handle Seasons
     """
 
     @token_required
@@ -25,7 +25,7 @@ class SeasonsView(MethodView):
                 return make_response(jsonify(response)), 404
             response = {
                 'status': 'success',
-                'teams': season.serialize()
+                'season': season.serialize()
             }
             return make_response(jsonify(response)), 200
 
@@ -39,7 +39,7 @@ class SeasonsView(MethodView):
 
         response = {
             'status': 'success',
-            'teams': [season.serialize() for season in seasons]
+            'seasons': [season.serialize() for season in seasons]
         }
         return make_response(jsonify(response)), 200
 
@@ -141,3 +141,24 @@ class SeasonsView(MethodView):
                 'message': 'Failed to delete season.'
             }
             return make_response(jsonify(response)), 500
+
+
+class CurrentSeasonView(MethodView):
+    """
+    View to handle current season
+    """
+
+    def get(self):
+        season = Season.find_first(is_current=True)
+        if not season:
+            response = {
+                'status': 'success',
+                'message': 'No season marked as current yet.'
+            }
+            return make_response(jsonify(response)), 200
+
+        response = {
+            'status': 'success',
+            'season': season.serialize()
+        }
+        return make_response(jsonify(response)), 200

@@ -47,8 +47,7 @@ class TeamsView(MethodView):
             }
             return make_response(jsonify(response)), 500
 
-    @token_required
-    def get(self, current_user, team_id=None):
+    def get(self, team_id=None):
         if team_id:
             team = Team.find_first(id=team_id)
             if not team:

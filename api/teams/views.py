@@ -130,3 +130,25 @@ class TeamsView(MethodView):
                 'message': 'Failed to delete team.'
             }
             return make_response(jsonify(response)), 500
+
+
+class LeagueStandingsView(MethodView):
+    """
+    View to handle league standings
+    """
+
+    def get(self, season_id):
+        season = Season.find_first(id=season_id)
+        if not season:
+            response = {
+                'status': 'fail',
+                'message': 'Season does not exist'
+            }
+            return make_response(jsonify(response)), 404
+
+        teams = season.teams.order_by(Team.league_position.asc()).all()
+        response = {
+            'status': 'success',
+            'teams': [team.serialize() for team in teams]
+        }
+        return make_response(jsonify(response)), 200

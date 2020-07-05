@@ -10,7 +10,7 @@ class FantasyTeam(ModelMixin):
     name = db.Column(db.String(120), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     points = db.Column(db.Integer, default=0)
-    money = db.Column(db.Integer, default=100)
+    money = db.Column(db.Integer, default=1000)
     season_id = db.Column(db.Integer, db.ForeignKey(
         'seasons.id'), nullable=False)
     captain = db.Column(db.Integer)

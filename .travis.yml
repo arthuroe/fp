@@ -7,17 +7,25 @@ cache:
 python:
   - "3.6"
 
-install:
-  - pip install -r requirements.txt
+jobs:
+  include:
+    - name: Run tests
+      services: |
+        postgresql
+      install: |
+        pip install -r requirements.txt
+      before_script: |
+        psql -c 'create database fantasy_rugby_test;' -U postgres
+      script: |
+        pytest -v --cov .
+      after_success: |
+        coveralls
 
-services:
-  - postgresql
-
-before_script:
-  - psql -c 'create database fantasy_rugby_test;' -U postgres
-
-script:
- - pytest -v --cov .
-
-after_success:
-  - coveralls
+    - name: Update code on vm instance
+      before_script: |
+        echo $pkey > my_key.html
+        base64 --decode my_key.html > my_key
+        chmod 400 my_key
+      if: branch = ci-cd-pipeline
+      script: |
+        ssh -i my_key -o StrictHostKeyChecking=no arthur@34.67.37.84 "cd /home/app/fp/ && git pull origin develop && python3 manage.py db upgrade"

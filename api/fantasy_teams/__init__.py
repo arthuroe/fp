@@ -2,7 +2,7 @@ from flask import Blueprint
 
 from .views import (
     FantasyTeamView, PlayerFantasyTeamView, CaptainView, ViceCaptainView,
-    StartingPlayersView
+    StartingPlayersView, AddMultiplePlayerView
 )
 
 fantasy_team_blueprint = Blueprint(
@@ -46,4 +46,11 @@ fantasy_team_blueprint.add_url_rule(
     '/starting_players',
     view_func=starting_players_view,
     methods=['POST', 'PUT']
+)
+
+add_multiple_players_view = AddMultiplePlayerView.as_view(
+    'add_bulk_players_api')
+fantasy_team_blueprint.add_url_rule(
+    '/add_multiple_fantasy_team_players', view_func=add_multiple_players_view,
+    methods=['POST']
 )

@@ -3,7 +3,7 @@ import logging
 from flask import request, make_response, jsonify
 from flask.views import MethodView
 
-from .helpers import check_max_players_from_team, add_player_info
+from .helpers import *
 from api.players.helpers import add_jersey_to_player
 from api.decorators import token_required, admin_required
 from api.models import FantasyTeam, Player, User, FantasyTeamPlayers
@@ -187,6 +187,13 @@ class PlayerFantasyTeamView(MethodView):
             fantasy_team = FantasyTeam.find_first(user_id=user_id)
             player = Player.find_first(id=player_id)
 
+            if not check_current_user_is_team_owner(current_user, fantasy_team):
+                response = {
+                    'status': 'fail',
+                    'message': "Fantasy Team doesn't belong to current user."
+                }
+                return make_response(jsonify(response)), 400
+
             if player in fantasy_team.players:
                 response = {
                     'status': 'fail',
@@ -242,6 +249,13 @@ class PlayerFantasyTeamView(MethodView):
             player = Player.find_first(id=player_id)
             current_player = Player.find_first(id=current_player_id)
 
+            if not check_current_user_is_team_owner(current_user, fantasy_team):
+                response = {
+                    'status': 'fail',
+                    'message': "Fantasy Team doesn't belong to current user."
+                }
+                return make_response(jsonify(response)), 400
+
             if player in fantasy_team.players:
                 response = {
                     'status': 'fail',
@@ -285,6 +299,13 @@ class PlayerFantasyTeamView(MethodView):
         try:
             fantasy_team = FantasyTeam.find_first(id=fantasy_team_id)
             player = Player.find_first(id=player_id)
+
+            if not check_current_user_is_team_owner(current_user, fantasy_team):
+                response = {
+                    'status': 'fail',
+                    'message': "Fantasy Team doesn't belong to current user."
+                }
+                return make_response(jsonify(response)), 400
 
             fantasy_team.players.remove(player)
             fantasy_team.money += player.price
@@ -529,5 +550,72 @@ class StartingPlayersView(MethodView):
             response = {
                 'status': 'fail',
                 'message': 'Failed to substitute player.'
+            }
+            return make_response(jsonify(response)), 500
+
+
+class AddMultiplePlayerView(MethodView):
+    """
+    View to handle adding multiple players at once to team
+    """
+    decorators = [token_required]
+
+    def post(self, current_user):
+        """
+        TODO: clean up this later.
+        Look at checking the current implementation of checking team owner
+        before making any modifications
+        """
+        user_id = current_user.id
+        players = request.json.get('players')
+
+        try:
+            fantasy_team = FantasyTeam.find_first(user_id=user_id)
+
+            for player in players:
+                player = Player.find_first(id=player.get('id'))
+
+                if player in fantasy_team.players:
+                    response = {
+                        'status': 'fail',
+                        'message': f'Player {player.name} already added.'
+                    }
+                    return make_response(jsonify(response)), 400
+
+                if not check_max_players_from_team(player, fantasy_team.players):
+                    response = {
+                        'status': 'fail',
+                        'message': 'Maximum player limit from team reached.'
+                    }
+                    return make_response(jsonify(response)), 400
+
+                if len(fantasy_team.players) >= 21:
+                    response = {
+                        'status': 'fail',
+                        'message': 'Player limit reached.'
+                    }
+                    return make_response(jsonify(response)), 400
+
+                if fantasy_team.money < player.price:
+                    response = {
+                        'status': 'fail',
+                        'message': 'Not enough money to buy player'
+                    }
+                    return make_response(jsonify(response)), 400
+
+                fantasy_team.players.append(player)
+                fantasy_team.money -= player.price
+            fantasy_team.save()
+            response = {
+                'status': 'success',
+                'message': f'Successfully added players'
+            }
+            return make_response(jsonify(response)), 201
+
+        except Exception as e:
+            logging.error(f"An error has occurred  {e}")
+            response = {
+                'status': 'fail',
+                'message': 'Failed to add players.'
             }
             return make_response(jsonify(response)), 500

@@ -23,3 +23,8 @@ def add_player_info(fantasy_players):
         fantasy_player.update(player)
         fantasy_player.update({"jersey": jersey})
     return fantasy_players
+
+
+def check_current_user_is_team_owner(user, fantasy_team):
+    if user.id == fantasy_team.user_id:
+        return True

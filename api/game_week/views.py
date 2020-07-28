@@ -139,3 +139,35 @@ class GameWeekView(MethodView):
                 'message': 'Failed to delete gameweek.'
             }
             return make_response(jsonify(response)), 500
+
+
+class CurrentGameWeekView(MethodView):
+    """
+    View for current GameWeek
+    """
+
+    @token_required
+    def get(self, current_user):
+        current_season = Season.find_first(is_current=True)
+        current_gameweek = current_season.gameweeks.filter_by(
+            is_current=True).all()
+
+        if not current_gameweek:
+            response = {
+                'status': 'fail',
+                'message': 'GameWeek does not exist'
+            }
+            return make_response(jsonify(response)), 404
+
+        fixtures = current_gameweek[0].fixtures.all()
+        current_gameweek = current_gameweek[0].serialize()
+
+        if fixtures:
+            fixtures = [fixture.serialize() for fixture in fixtures]
+
+        current_gameweek.update({"fixtures": []})
+        response = {
+            'status': 'success',
+            'game_week': current_gameweek
+        }
+        return make_response(jsonify(response)), 200

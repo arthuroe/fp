@@ -1,10 +1,12 @@
 import os
 
+from apscheduler.schedulers.background import BackgroundScheduler
 from flask import Flask
 from flask_cors import CORS
 from flask_mail import Mail
 
 from config import app_configuration
+
 
 app = Flask(__name__)
 
@@ -26,6 +28,7 @@ from api.teams import teams_blueprint
 from api.users import user_blueprint
 from api.gameweek_stats import gameweek_stats_blueprint
 
+
 db.init_app(app)
 
 app.register_blueprint(auth_blueprint)
@@ -41,9 +44,14 @@ app.register_blueprint(user_blueprint)
 app.register_blueprint(gameweek_stats_blueprint)
 
 
+from api.tasks import update_current_game_week
+
+sched = BackgroundScheduler(daemon=True)
+sched.add_job(update_current_game_week,'interval', days=3)
+sched.start()
+
 # add support for CORS for all end points
 CORS(app)
-
 
 @app.route('/')
 def index():

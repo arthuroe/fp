@@ -241,47 +241,52 @@ class PlayerFantasyTeamView(MethodView):
             return make_response(jsonify(response)), 500
 
     def put(self, current_user, fantasy_team_id):
-        player_id = request.json.get('player_id')
-        current_player_id = request.json.get('current_player_id')
+        transfers = request.json.get('transfers')
 
         try:
             fantasy_team = FantasyTeam.find_first(id=fantasy_team_id)
-            player = Player.find_first(id=player_id)
-            current_player = Player.find_first(id=current_player_id)
 
-            if not check_current_user_is_team_owner(current_user, fantasy_team):
+            if not check_current_user_is_team_owner(
+                    current_user, fantasy_team):
                 response = {
                     'status': 'fail',
-                    'message': "Fantasy Team doesn't belong to current user."
+                    'message': (
+                        "Fantasy Team doesn't belong to current user.")
                 }
                 return make_response(jsonify(response)), 400
 
-            if player in fantasy_team.players:
-                response = {
-                    'status': 'fail',
-                    'message': 'Player already added.'
-                }
-                return make_response(jsonify(response)), 400
+            for transfer in transfers:
+                incoming_player_id = transfer.get('incoming_player_id')
+                current_player_id = transfer.get('current_player_id')
+                player = Player.find_first(id=incoming_player_id)
+                current_player = Player.find_first(id=current_player_id)
 
-            if (fantasy_team.money + current_player.price) < player.price:
-                response = {
-                    'status': 'fail',
-                    'message': 'Not enough money to buy player'
-                }
-                return make_response(jsonify(response)), 400
+                if player in fantasy_team.players:
+                    response = {
+                        'status': 'fail',
+                        'message': 'Player already added.'
+                    }
+                    return make_response(jsonify(response)), 400
 
-            players = fantasy_team.players
+                if (fantasy_team.money + current_player.price) < player.price:
+                    response = {
+                        'status': 'fail',
+                        'message': 'Not enough money to buy players'
+                    }
+                    return make_response(jsonify(response)), 400
 
-            fantasy_team.players.remove(current_player)
-            fantasy_team.money += current_player.price
+                players = fantasy_team.players
 
-            fantasy_team.players.append(player)
-            fantasy_team.money -= player.price
+                fantasy_team.players.remove(current_player)
+                fantasy_team.money += current_player.price
+
+                fantasy_team.players.append(player)
+                fantasy_team.money -= player.price
 
             fantasy_team.save()
             response = {
                 'status': 'success',
-                'message': f'Successfully added {player.name}'
+                'message': f'Successfully added players.'
             }
             return make_response(jsonify(response)), 201
 

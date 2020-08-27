@@ -14,6 +14,4 @@ class Team(ModelMixin):
     manager = db.Column(db.String(180))
     jersey = db.Column(db.String(180))
     players = db.relationship(
-        "Player", backref="team", lazy="dynamic")
-    season = db.relationship(
-        "Season", secondary="season_teams", lazy="dynamic")
+        "Player", backref="teams", lazy="dynamic")

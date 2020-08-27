@@ -14,7 +14,7 @@ class Season(ModelMixin):
     start_date = db.Column(db.DateTime, nullable=False)
     end_date = db.Column(db.DateTime, nullable=False)
     is_current = db.Column(db.Boolean, default=False)
-    teams = db.relationship("Team", backref="teams",
+    teams = db.relationship("Team", backref="seasons",
                             secondary="season_teams", lazy="dynamic")
     gameweeks = db.relationship(
         "GameWeek", backref="season", lazy="dynamic")

@@ -13,7 +13,7 @@ class Player(ModelMixin):
     age = db.Column(db.Integer)
     price = db.Column(db.Integer, default=8)
     points = db.Column(db.Integer)
-    availability = db.Column(db.String(180))
+    availability = db.Column(db.Boolean, default=True)
     fantasy_teams = db.relationship(
         'FantasyTeam', secondary='fantasy_team_players', backref='players',
         lazy='dynamic'

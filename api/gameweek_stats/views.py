@@ -5,7 +5,7 @@ from flask.views import MethodView
 
 from .helpers import *
 from api.decorators import admin_required, token_required
-from api.models import PlayerGameWeek, GameWeek, FantasyTeam
+from api.models import PlayerGameWeek, GameWeek, FantasyTeam, Player
 
 
 class GameWeekStatsView(MethodView):
@@ -53,12 +53,20 @@ class GameWeekStatsView(MethodView):
             if check_gameweek_stats_exist:
                 response = {
                     'status': 'fail',
-                    'Message': 'Stats already added, please update exsiting stats.'
+                    'Message': (
+                        'Stats already added, please update exsiting stats.')
                 }
                 return make_response(jsonify(response)), 400
 
             gameweek_stats = PlayerGameWeek(**kwargs)
             gameweek_stats.gameweek_points = award_points(**kwargs)
+
+            player = Player.find_first(id=player_id)
+            fantasy_teams = player.fantasy_teams
+
+            for fantasy_team in fantasy_teams:
+                gameweek_stats.fantasy_teams.append(fantasy_team)
+
             gameweek_stats.save()
             response = {
                 'status': 'success',

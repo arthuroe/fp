@@ -9,3 +9,10 @@ db.Table('user_teams',
          db.Column('user_id', db.Integer, db.ForeignKey('users.id')),
          db.Column('team_id', db.Integer, db.ForeignKey('teams.id'))
          )
+
+db.Table('fatasy_team_player_gameweek',
+         db.Column('player_gameweek_id', db.Integer,
+                   db.ForeignKey('player_gameweeks.id')),
+         db.Column('fantasy_team_id', db.Integer,
+                   db.ForeignKey('fantasy_teams.id'))
+         )

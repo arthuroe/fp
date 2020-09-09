@@ -23,6 +23,8 @@ class User(ModelMixin):
     receive_club_notifications = db.Column(db.Boolean, default=False)
     is_admin = db.Column(db.Boolean, default=False)
     photo = db.Column(db.String(180))
+    transfers = db.Column(db.Integer, default=2)
+    points_deductible = db.Column(db.Integer, default=0)
     fantasy_team_created = db.Column(db.Boolean, default=False)
     fantasy_team = db.relationship(
         'FantasyTeam', backref='user', lazy='dynamic')

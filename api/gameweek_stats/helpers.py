@@ -38,8 +38,10 @@ def award_try_points(**kwargs):
 
 def get_fantasy_player_stats(gameweeks_players, game_week_id):
     team = []
+    points = 0
     for player in gameweeks_players:
         if player.game_week_id == int(game_week_id):
+            points += player.gameweek_points
             info = player.player_info
             jersey = info.team.jersey
             info = info.serialize()
@@ -47,7 +49,7 @@ def get_fantasy_player_stats(gameweeks_players, game_week_id):
             player = player.serialize()
             player.update({"info": info})
             team.append(player)
-    return team
+    return team, points
 
 
 def get_top_players_in_category(players, position, number_of_players):

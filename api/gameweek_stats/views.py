@@ -157,12 +157,13 @@ class GameWeekStatsFantasyView(MethodView):
             }
             return make_response(jsonify(response)), 404
 
-        fantasy_team_player_stats = get_fantasy_player_stats(
+        fantasy_team_player_stats, points = get_fantasy_player_stats(
             gameweeks_players, game_week_id)
 
         response = {
             'status': 'success',
-            'fantasy_team_stats': fantasy_team_player_stats
+            'fantasy_team_stats': fantasy_team_player_stats,
+            "total_points": points
         }
         return make_response(jsonify(response)), 200
 

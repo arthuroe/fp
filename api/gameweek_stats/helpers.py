@@ -36,15 +36,18 @@ def award_try_points(**kwargs):
     return kwargs.get('tries') * 4
 
 
-def get_fantasy_player_stats(fantasy_team_players, game_week_id):
-    player_stats = []
-    team_points = 0
-    for fantasy_team_player in fantasy_team_players:
-        player = PlayerGameWeek.filter_by(
-            player_id=fantasy_team_player.id, game_week_id=game_week_id).all()
-        if player:
-            player_stats.append(player[0].serialize())
-    return player_stats
+def get_fantasy_player_stats(gameweeks_players, game_week_id):
+    team = []
+    for player in gameweeks_players:
+        if player.game_week_id == int(game_week_id):
+            info = player.player_info
+            jersey = info.team.jersey
+            info = info.serialize()
+            info.update({"jersey": jersey})
+            player = player.serialize()
+            player.update({"info": info})
+            team.append(player)
+    return team
 
 
 def get_top_players_in_category(players, position, number_of_players):

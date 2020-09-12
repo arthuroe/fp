@@ -85,6 +85,12 @@ class FantasyLeagueUsersView(MethodView):
             fantasyleague_id=fantasy_league_id).order_by(
                 FantasyLeagueTeam.points.desc())
 
+        all_teams = []
+        for team in league_teams:
+            details = FantasyTeam.find_first(team.fantasyteam_id)
+            team = team.serialize()
+            all_teams.append(team.update(details.serialize()))
+
         response = {
             'status': 'success',
             'league_teams': [team.serialize() for team in league_teams]

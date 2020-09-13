@@ -3,6 +3,7 @@ import logging
 from flask import request, make_response, jsonify
 from flask.views import MethodView
 
+from .helpers import *
 from api.decorators import token_required
 from api.models import FantasyLeague, FantasyTeam, FantasyLeagueTeam
 
@@ -85,15 +86,11 @@ class FantasyLeagueUsersView(MethodView):
             fantasyleague_id=fantasy_league_id).order_by(
                 FantasyLeagueTeam.points.desc())
 
-        all_teams = []
-        for team in league_teams:
-            details = FantasyTeam.find_first(team.fantasyteam_id)
-            team = team.serialize()
-            all_teams.append(team.update(details.serialize()))
+        all_teams = get_fantasy_team_info(league_teams)
 
         response = {
             'status': 'success',
-            'league_teams': [team.serialize() for team in league_teams]
+            'league_teams': all_teams
         }
         return make_response(jsonify(response)), 200
 

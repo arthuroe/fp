@@ -12,7 +12,7 @@ class PlayerGameWeek(ModelMixin):
     player_id = db.Column(db.Integer, db.ForeignKey(
         'players.id'), nullable=False)
     fixture_id = db.Column(db.Integer, db.ForeignKey(
-        'fixtures.id'), nullable=false)
+        'fixtures.id'), nullable=False)
     minutes_played = db.Column(db.Integer, default=0)
     yellow_card = db.Column(db.Boolean, default=False)
     red_card = db.Column(db.Boolean, default=False)

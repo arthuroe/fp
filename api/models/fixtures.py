@@ -16,3 +16,5 @@ class Fixture(ModelMixin):
     away_team_result = db.Column(db.Integer)
     game_week_id = db.Column(db.Integer, db.ForeignKey(
         'gameweeks.id'), nullable=False)
+    player_stats = db.relationship(
+        'PlayerGameWeek', backref="fixture", lazy="dynamic")

@@ -3,6 +3,7 @@ import logging
 from flask import request, make_response, jsonify
 from flask.views import MethodView
 
+from .helpers import *
 from api.decorators import admin_required, token_required
 from api.models import Fixture, GameWeek
 
@@ -13,18 +14,50 @@ class FixturesView(MethodView):
     """
 
     @token_required
-    def get(self, current_user, game_week_id=None):
+    def get(self, current_user, game_week_id=None, fixture_id=None):
         if game_week_id:
-            fixture = Fixture.find_first(game_week_id=game_week_id)
-            if not game_week_id:
+            game_week = GameWeek.find_first(id=game_week_id)
+            if not game_week:
                 response = {
                     'status': 'fail',
-                    'message': 'Fixture does not exist'
+                    'message': 'GameWeek does not exist'
                 }
                 return make_response(jsonify(response)), 404
+
+            fixtures = Fixture.filter_by(game_week_id=game_week_id)
+
             response = {
                 'status': 'success',
-                'fixture': fixture.serialize()
+                'fixtures': [fixture.serialize() for fixture in fixtures.all()]
+            }
+            return make_response(jsonify(response)), 200
+
+        if fixture_id:
+            fixture = Fixture.find_first(id=fixture_id)
+            if not fixture:
+                response = {
+                    'status': 'fail',
+                    'message': 'GameWeek does not exist'
+                }
+                return make_response(jsonify(response)), 404
+
+            stats = fixture.player_stats.filter_by(
+                game_week_id=fixture.game_week_id).all()
+
+            serialized_fixture = fixture.serialize()
+            home_team, away_team = get_player_stats(stats, fixture)
+
+            serialized_fixture.update(
+                {
+                    "player_stats": {
+                        "home_team": home_team, "away_team": away_team
+                    }
+                }
+            )
+
+            response = {
+                'status': 'success',
+                'fixture': serialized_fixture
             }
             return make_response(jsonify(response)), 200
 
@@ -44,9 +77,9 @@ class FixturesView(MethodView):
 
     @token_required
     @admin_required
-    def post(self, current_user, game_week_id):
-        kwargs = request.json()
-        kwargs.update({"game_week_id": game_week_id})
+    def post(self, current_user):
+        kwargs = request.json
+        game_week_id = kwargs.get('game_week_id')
         try:
             fixture = Fixture(**kwargs)
             game_week = GameWeek.find_first(id=game_week_id)
@@ -85,7 +118,7 @@ class FixturesView(MethodView):
     @token_required
     @admin_required
     def put(self, current_user, fixture_id):
-        kwargs = request.json()
+        kwargs = request.json
         kwargs.update({"id": fixture_id})
         try:
             fixture = Fixture.find_first(id=fixture_id)

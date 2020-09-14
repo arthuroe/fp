@@ -5,8 +5,12 @@ from .views import FixturesView
 fixtures_blueprint = Blueprint('fixtures', __name__, url_prefix='/api/v1')
 fixtures_view = FixturesView.as_view('fixtures_api')
 fixtures_blueprint.add_url_rule(
-    '/fixtures', view_func=fixtures_view, methods=['GET'])
+    '/fixtures', view_func=fixtures_view, methods=['GET', 'POST'])
 fixtures_blueprint.add_url_rule(
-    '/fixtures/<game_week_id>', view_func=fixtures_view, methods=['GET', 'POST'])
+    '/game_week/<game_week_id>/fixtures',
+    view_func=fixtures_view, methods=['GET']
+)
 fixtures_blueprint.add_url_rule(
-    '/fixtures/<fixture_id>', view_func=fixtures_view, methods=['PUT', 'DELETE'])
+    '/fixtures/<fixture_id>', view_func=fixtures_view,
+    methods=['GET', 'PUT', 'DELETE']
+)

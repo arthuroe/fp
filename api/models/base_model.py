@@ -25,6 +25,16 @@ class ModelMixin(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.utcnow,
                            onupdate=datetime.utcnow)
 
+    def __repr__(self):
+        """REPL representation of model instance."""
+        string_representation = self.__str__().replace("{", "(").replace(
+            "}", ")").replace(":", "=")
+        return f"{type(self).__name__}{string_representation}"
+
+    def __str__(self):
+        """String representation of model."""
+        return str(self.serialize())
+
     def serialize(self):
         """Map model objects to dict representation."""
         return {column.name: getattr(self, column.name)
@@ -95,3 +105,8 @@ class ModelMixin(db.Model):
         except SQLAlchemyError:
             db.session.rollback()
             return False
+
+    @classmethod
+    def paginate(cls, **kwargs):
+        """Query and paginate the data of a model, returning the first result."""
+        return cls.query.paginate(**kwargs)

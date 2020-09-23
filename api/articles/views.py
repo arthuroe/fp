@@ -1,6 +1,6 @@
 import logging
 
-from flask import Blueprint, request, make_response, jsonify
+from flask import current_app, Blueprint, request, make_response, jsonify
 from flask.views import MethodView
 
 from api.decorators import admin_required, token_required
@@ -13,6 +13,15 @@ class ArticlesView(MethodView):
     """
 
     def get(self, article_id=None):
+        page = request.args.get('page', type=int)
+        limit = request.args.get('limit', type=int)
+        previous_url = ""
+        next_url = ""
+
+        _page = int(page or current_app.config['DEFAULT_PAGE'])
+
+        _limit = int(limit or current_app.config['PAGE_LIMIT'])
+
         if article_id:
             article = Article.find_first(id=article_id)
             if not article:
@@ -28,7 +37,9 @@ class ArticlesView(MethodView):
             }
             return make_response(jsonify(response)), 200
 
-        articles = Article.fetch_all()
+        articles = Article.paginate(
+            page=_page, per_page=_limit, error_out=False)
+
         if not articles:
             response = {
                 'status': 'success',
@@ -38,7 +49,7 @@ class ArticlesView(MethodView):
 
         response = {
             'status': 'success',
-            'articles': [article.serialize() for article in articles]
+            'articles': [article.serialize() for article in articles.items]
         }
         return make_response(jsonify(response)), 200
 

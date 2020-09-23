@@ -22,6 +22,8 @@ class Config:
     MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')
     MAIL_USE_TLS = False
     MAIL_USE_SSL = True
+    PAGE_LIMIT = 10
+    DEFAULT_PAGE = 1
 
 
 class DevelopmentConfiguration(Config):

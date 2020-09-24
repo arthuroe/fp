@@ -21,14 +21,15 @@ jobs:
       after_success: |
         coveralls
 
-    - name: Update code on vm instance
-      before_script: |
-        echo $pkey > my_key.html
-        base64 --decode my_key.html > my_key
-        chmod 400 my_key
-      if: branch = develop
-      script: |
-        ssh -i my_key -o StrictHostKeyChecking=no arthur@34.67.37.84 \
-        "cd /home/app/fp/ && git pull origin develop && \
-        source /home/app/fl_env/bin/activate && \
-        pip install -r requirements.txt && python3 manage.py db upgrade"
+    # Disabled because the instance is offline
+    # - name: Update code on vm instance
+    #   before_script: |
+    #     echo $pkey > my_key.html
+    #     base64 --decode my_key.html > my_key
+    #     chmod 400 my_key
+    #   if: branch = develop
+    #   script: |
+    #     ssh -i my_key -o StrictHostKeyChecking=no arthur@34.67.37.84 \
+    #     "cd /home/app/fp/ && git pull origin develop && \
+    #     source /home/app/fl_env/bin/activate && \
+    #     pip install -r requirements.txt && python3 manage.py db upgrade"

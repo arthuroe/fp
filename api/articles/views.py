@@ -1,6 +1,7 @@
 import logging
 
-from flask import current_app, Blueprint, request, make_response, jsonify
+from flask import (
+    current_app, Blueprint, request, make_response, jsonify, url_for)
 from flask.views import MethodView
 
 from api.decorators import admin_required, token_required
@@ -19,7 +20,6 @@ class ArticlesView(MethodView):
         next_url = ""
 
         _page = int(page or current_app.config['DEFAULT_PAGE'])
-
         _limit = int(limit or current_app.config['PAGE_LIMIT'])
 
         if article_id:
@@ -40,16 +40,29 @@ class ArticlesView(MethodView):
         articles = Article.paginate(
             page=_page, per_page=_limit, error_out=False)
 
-        if not articles:
+        if not articles.items:
             response = {
                 'status': 'success',
                 'message': 'No articles have been added'
             }
             return make_response(jsonify(response)), 200
 
+        previous_url = None
+        next_url = None
+
+        if articles.has_next:
+            next_url = url_for(request.endpoint, limit=limit, page=_page + 1)
+        if articles.has_prev:
+            previous_url = url_for(
+                request.endpoint, limit=limit, page=_page - 1)
+
         response = {
             'status': 'success',
-            'articles': [article.serialize() for article in articles.items]
+            'articles': [article.serialize() for article in articles.items],
+            "next_url": next_url,
+            "previous_url": previous_url,
+            "current_page": articles.page,
+            "count": len(articles.items)
         }
         return make_response(jsonify(response)), 200
 

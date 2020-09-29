@@ -1,6 +1,6 @@
 import logging
 
-from flask import request, make_response, jsonify
+from flask import current_app, request, make_response, jsonify, url_for
 from flask.views import MethodView
 
 from .helpers import *
@@ -15,6 +15,14 @@ class FixturesView(MethodView):
 
     @token_required
     def get(self, current_user, game_week_id=None, fixture_id=None):
+        page = request.args.get('page', type=int)
+        limit = request.args.get('limit', type=int)
+        previous_url = ""
+        next_url = ""
+
+        _page = int(page or current_app.config['DEFAULT_PAGE'])
+        _limit = int(limit or current_app.config['PAGE_LIMIT'])
+
         if game_week_id:
             game_week = GameWeek.find_first(id=game_week_id)
             if not game_week:
@@ -61,17 +69,32 @@ class FixturesView(MethodView):
             }
             return make_response(jsonify(response)), 200
 
-        fixtures = Fixture.fetch_all()
-        if not fixtures:
+        fixtures = Fixture.paginate(
+            page=_page, per_page=_limit, error_out=False)
+
+        if not fixtures.items:
             response = {
                 'status': 'success',
                 'message': 'No fixtures have been added'
             }
             return make_response(jsonify(response)), 200
 
+        previous_url = None
+        next_url = None
+
+        if fixtures.has_next:
+            next_url = url_for(request.endpoint, limit=limit, page=_page + 1)
+        if fixtures.has_prev:
+            previous_url = url_for(
+                request.endpoint, limit=limit, page=_page - 1)
+
         response = {
             'status': 'success',
-            'fixtures': [fixture.serialize() for fixture in fixtures]
+            'fixtures': [fixture.serialize() for fixture in fixtures.items],
+            "next_url": next_url,
+            "previous_url": previous_url,
+            "current_page": fixtures.page,
+            "count": len(fixtures.items)
         }
         return make_response(jsonify(response)), 200
 

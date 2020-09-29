@@ -1,7 +1,6 @@
 import logging
 
-from flask import (
-    current_app, Blueprint, request, make_response, jsonify, url_for)
+from flask import current_app, request, make_response, jsonify, url_for
 from flask.views import MethodView
 
 from api.decorators import admin_required, token_required

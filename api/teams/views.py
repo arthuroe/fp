@@ -19,6 +19,7 @@ class TeamsView(MethodView):
         name = post_data.get('name')
         manager = post_data.get('manager')
         logo = post_data.get("logo")
+        jersey = post_data.get("jersey")
         season_id = post_data.get('season_id')
 
         if not all([name, manager, season_id]):
@@ -30,7 +31,7 @@ class TeamsView(MethodView):
 
         try:
             season = Season.find_first(id=season_id)
-            team = Team(name=name, manager=manager, logo=logo)
+            team = Team(name=name, manager=manager, logo=logo, jersey=jersey)
             season.teams.append(team)
             season.save()
             team.save()

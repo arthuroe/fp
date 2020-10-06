@@ -148,7 +148,6 @@ class GameWeekStatsFantasyView(MethodView):
             return make_response(jsonify(response)), 404
 
         fantasy_team = FantasyTeam.find_first(id=fantasy_team_id)
-        gameweeks_players = fantasy_team.player_gameweeks
 
         if not fantasy_team or not fantasy_team.players:
             response = {
@@ -158,7 +157,7 @@ class GameWeekStatsFantasyView(MethodView):
             return make_response(jsonify(response)), 404
 
         fantasy_team_player_stats, points = get_fantasy_player_stats(
-            gameweeks_players, game_week_id)
+            fantasy_team, game_week_id)
 
         response = {
             'status': 'success',

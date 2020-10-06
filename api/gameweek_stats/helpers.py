@@ -1,4 +1,4 @@
-from api.models import Player, PlayerGameWeek
+from api.models import FantasyTeamPlayers, Player, PlayerGameWeek
 
 
 def award_points(**kwargs):
@@ -36,10 +36,22 @@ def award_try_points(**kwargs):
     return kwargs.get('tries') * 4
 
 
-def get_fantasy_player_stats(gameweeks_players, game_week_id):
+def get_fantasy_player_stats(fantasy_team, game_week_id):
     team = []
     points = 0
+
+    gameweeks_players = fantasy_team.player_gameweeks
+    fantasy_team_players = fantasy_team.players
+
     for player in gameweeks_players:
+        fantasy_team_info = FantasyTeamPlayers.filter_by(
+            id=player.player_id).all()
+        fantasy_team_info = fantasy_team_info[0].serialize()
+        fantasy_team_info = {
+            'is_sub': fantasy_team_info['is_sub'],
+            'is_captain': fantasy_team_info['is_captain'],
+            'is_vice_captain': fantasy_team_info['is_vice_captain']
+        }
         if player.game_week_id == int(game_week_id):
             points += player.gameweek_points
             info = player.player_info
@@ -48,7 +60,9 @@ def get_fantasy_player_stats(gameweeks_players, game_week_id):
             info.update({"jersey": jersey})
             player = player.serialize()
             player.update({"info": info})
+            player.update(fantasy_team_info)
             team.append(player)
+
     return team, points
 
 

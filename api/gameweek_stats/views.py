@@ -5,7 +5,7 @@ from flask.views import MethodView
 
 from .helpers import *
 from api.decorators import admin_required, token_required
-from api.models import PlayerGameWeek, GameWeek, FantasyTeam, Player
+from api.models import PlayerGameWeek, GameWeek, FantasyTeam, Player, FantasyTeamPlayerGameWeek
 
 
 class GameWeekStatsView(MethodView):
@@ -60,14 +60,12 @@ class GameWeekStatsView(MethodView):
 
             gameweek_stats = PlayerGameWeek(**kwargs)
             gameweek_stats.gameweek_points = award_points(**kwargs)
+            gameweek_stats.save()
 
             player = Player.find_first(id=player_id)
-            fantasy_teams = player.fantasy_teams
 
-            for fantasy_team in fantasy_teams:
-                gameweek_stats.fantasy_teams.append(fantasy_team)
+            update_fantasy_player_gameweek(player, gameweek_stats)
 
-            gameweek_stats.save()
             response = {
                 'status': 'success',
                 'stats': gameweek_stats.serialize()
@@ -95,6 +93,11 @@ class GameWeekStatsView(MethodView):
             stat = PlayerGameWeek.find_first(id=stat_id)
             stat.update(**kwargs)
             stat.gameweek_points = award_points(**kwargs)
+            stat.save()
+
+            player = Player.find_first(id=player_id)
+
+            update_fantasy_player_gameweek(player, stat)
             response = {
                 'status': 'success',
                 'stats': stat.serialize()
@@ -127,7 +130,7 @@ class GameWeekStatsView(MethodView):
             logging.error(f"An error has occurred  {e}")
             response = {
                 'status': 'fail',
-                'message': 'Failed to update gameweek stats.'
+                'message': 'Failed to delete gameweek stats.'
             }
             return make_response(jsonify(response)), 500
 

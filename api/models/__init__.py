@@ -7,6 +7,7 @@ from .fantasy_league import FantasyLeague
 from .fantasyleague_team import FantasyLeagueTeam
 from .fantasy_team import FantasyTeam
 from .fantasy_team_players import FantasyTeamPlayers
+from .fantasy_team_player_gameweek import FantasyTeamPlayerGameWeek
 from .fixtures import Fixture
 from .game_week import GameWeek
 from .pivot_tables import *

@@ -26,6 +26,6 @@ class PlayerGameWeek(ModelMixin):
     man_of_the_match = db.Column(db.Boolean, default=False)
     gameweek_points = db.Column(db.Integer, default=0)
     fantasy_teams = db.relationship(
-        'FantasyTeam', secondary='fantasy_team_player_gameweek',
+        'FantasyTeam', secondary='fantasy_team_player_gameweeks',
         backref='player_gameweeks', lazy='dynamic'
     )

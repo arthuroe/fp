@@ -1,4 +1,5 @@
-from api.models import FantasyTeamPlayers, Player, PlayerGameWeek
+from api.models import FantasyTeamPlayers, Player, PlayerGameWeek, FantasyTeamPlayerGameWeek
+# from api.models import PlayerGameWeek, GameWeek, FantasyTeam, Player, FantasyTeamPlayerGameWeek
 
 
 def award_points(**kwargs):
@@ -44,14 +45,19 @@ def get_fantasy_player_stats(fantasy_team, game_week_id):
     fantasy_team_players = fantasy_team.players
 
     for player in gameweeks_players:
+        import pdb
+        pdb.set_trace()
         fantasy_team_info = FantasyTeamPlayers.filter_by(
-            id=player.player_id).all()
-        fantasy_team_info = fantasy_team_info[0].serialize()
-        fantasy_team_info = {
-            'is_sub': fantasy_team_info['is_sub'],
-            'is_captain': fantasy_team_info['is_captain'],
-            'is_vice_captain': fantasy_team_info['is_vice_captain']
-        }
+            player_id=player.player_id, fantasyteam_id=fantasy_team.id).all()
+
+        # player_team_info = {}
+        # if fantasy_team_info:
+        #     fantasy_team_info = fantasy_team_info[0].serialize()
+        #     player_team_info = {
+        #         'is_sub': fantasy_team_info['is_sub'],
+        #         'is_captain': fantasy_team_info['is_captain'],
+        #         'is_vice_captain': fantasy_team_info['is_vice_captain']
+        #     }
         if player.game_week_id == int(game_week_id):
             points += player.gameweek_points
             info = player.player_info
@@ -60,7 +66,7 @@ def get_fantasy_player_stats(fantasy_team, game_week_id):
             info.update({"jersey": jersey})
             player = player.serialize()
             player.update({"info": info})
-            player.update(fantasy_team_info)
+            # player.update(player_team_info)
             team.append(player)
 
     return team, points
@@ -71,3 +77,46 @@ def get_top_players_in_category(players, position, number_of_players):
         position=position).order_by(
         PlayerGameWeek.gameweek_points.desc()).limit(number_of_players).all()
     return players
+
+
+def update_fantasy_player_gameweek(player, gameweek_stats):
+    fantasy_teams = player.fantasy_teams
+
+    for fantasy_team in fantasy_teams:
+        try:
+            fantasy_player_gameweek = FantasyTeamPlayerGameWeek.filter_by(
+                player_gameweek_id=gameweek_stats.id,
+                fantasy_team_id=fantasy_team.id
+            ).all()
+
+            if not fantasy_player_gameweek:
+                gameweek_stats.fantasy_teams.append(fantasy_team)
+                gameweek_stats.save()
+
+            fantasy_player = FantasyTeamPlayers.filter_by(
+                fantasyteam_id=fantasy_team.id).filter_by(
+                player_id=player.id).all()
+
+            fantasy_player_gameweek = FantasyTeamPlayerGameWeek.filter_by(
+                player_gameweek_id=gameweek_stats.id,
+                fantasy_team_id=fantasy_team.id
+            ).all()
+
+            fantasy_player_gameweek[0].is_sub = fantasy_player[0].is_sub
+            fantasy_player_gameweek[0].is_captain = fantasy_player[0].is_captain
+            fantasy_player_gameweek[0].is_vice_captain = fantasy_player[0].is_vice_captain
+            fantasy_player_gameweek[0].points = gameweek_stats.gameweek_points
+
+            if fantasy_player[0].is_captain:
+                fantasy_player_gameweek[0].points = fantasy_player_gameweek[0].points * 3
+            if fantasy_player[0].is_vice_captain:
+                fantasy_player_gameweek[0].points = fantasy_player_gameweek[0].points * 2
+            fantasy_player_gameweek[0].save()
+        except Exception as e:
+            logging.error(f"An error has occurred  {e}")
+            response = {
+                'status': 'fail',
+                'message': ("Failed to update player "
+                            f"{player} stats in fantasy team {fantasy_team}.")
+            }
+            return make_response(jsonify(response)), 500

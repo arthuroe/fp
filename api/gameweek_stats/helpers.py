@@ -45,28 +45,26 @@ def get_fantasy_player_stats(fantasy_team, game_week_id):
     fantasy_team_players = fantasy_team.players
 
     for player in gameweeks_players:
-        import pdb
-        pdb.set_trace()
+
         fantasy_team_info = FantasyTeamPlayers.filter_by(
             player_id=player.player_id, fantasyteam_id=fantasy_team.id).all()
 
-        # player_team_info = {}
-        # if fantasy_team_info:
-        #     fantasy_team_info = fantasy_team_info[0].serialize()
-        #     player_team_info = {
-        #         'is_sub': fantasy_team_info['is_sub'],
-        #         'is_captain': fantasy_team_info['is_captain'],
-        #         'is_vice_captain': fantasy_team_info['is_vice_captain']
-        #     }
         if player.game_week_id == int(game_week_id):
-            points += player.gameweek_points
+            fantasy_team_gameweek_info = FantasyTeamPlayerGameWeek.find_first(
+                player_gameweek_id=player.id)
+
+            if not fantasy_team_gameweek_info.is_sub:
+                points += fantasy_team_gameweek_info.points
+
             info = player.player_info
             jersey = info.team.jersey
             info = info.serialize()
             info.update({"jersey": jersey})
             player = player.serialize()
+            fantasy_team_gameweek_info = fantasy_team_gameweek_info.serialize()
             player.update({"info": info})
-            # player.update(player_team_info)
+            player.update(
+                {"gameweek_fantasy_team_info": fantasy_team_gameweek_info})
             team.append(player)
 
     return team, points

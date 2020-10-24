@@ -1,5 +1,4 @@
 from api.models import FantasyTeamPlayers, Player, PlayerGameWeek, FantasyTeamPlayerGameWeek
-# from api.models import PlayerGameWeek, GameWeek, FantasyTeam, Player, FantasyTeamPlayerGameWeek
 
 
 def award_points(**kwargs):
@@ -51,7 +50,7 @@ def get_fantasy_player_stats(fantasy_team, game_week_id):
 
         if player.game_week_id == int(game_week_id):
             fantasy_team_gameweek_info = FantasyTeamPlayerGameWeek.find_first(
-                player_gameweek_id=player.id)
+                player_gameweek_id=player.id, fantasy_team_id=fantasy_team.id)
 
             if not fantasy_team_gameweek_info.is_sub:
                 points += fantasy_team_gameweek_info.points

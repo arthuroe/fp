@@ -3,6 +3,7 @@ import logging
 from flask import request, make_response, jsonify
 from flask.views import MethodView
 
+from .helpers import *
 from api.decorators import admin_required, token_required
 from api.models import GameWeek, Season
 
@@ -26,16 +27,21 @@ class GameWeekView(MethodView):
             game_week = GameWeek.find_first(
                 id=game_week_id, season_id=season_id)
 
-            if not game_week_id:
+            if not game_week:
                 response = {
                     'status': 'fail',
                     'message': 'GameWeek does not exist'
                 }
                 return make_response(jsonify(response)), 404
 
+            fixtures = get_gameweek_fixtures(game_week)
+            fixtures = [get_team_info(fixture) for fixture in fixtures]
+            game_week = game_week.serialize()
+            game_week.update({"fixtures": fixtures})
+
             response = {
                 'status': 'success',
-                'game_week': game_week.serialize()
+                'game_week': game_week
             }
             return make_response(jsonify(response)), 200
 
@@ -146,8 +152,7 @@ class CurrentGameWeekView(MethodView):
     View for current GameWeek
     """
 
-    @token_required
-    def get(self, current_user):
+    def get(self):
         current_season = Season.find_first(is_current=True)
         current_gameweek = current_season.gameweeks.filter_by(
             is_current=True).all()
@@ -159,13 +164,10 @@ class CurrentGameWeekView(MethodView):
             }
             return make_response(jsonify(response)), 404
 
-        fixtures = current_gameweek[0].fixtures.all()
+        fixtures = get_gameweek_fixtures(current_gameweek[0])
         current_gameweek = current_gameweek[0].serialize()
 
-        if fixtures:
-            fixtures = [fixture.serialize() for fixture in fixtures]
-
-        current_gameweek.update({"fixtures": []})
+        current_gameweek.update({"fixtures": fixtures})
         response = {
             'status': 'success',
             'game_week': current_gameweek

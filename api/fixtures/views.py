@@ -62,6 +62,7 @@ class FixturesView(MethodView):
                     }
                 }
             )
+            get_team_info(serialized_fixture)
 
             response = {
                 'status': 'success',
@@ -90,7 +91,7 @@ class FixturesView(MethodView):
 
         response = {
             'status': 'success',
-            'fixtures': [fixture.serialize() for fixture in fixtures.items],
+            'fixtures': [get_team_info(fixture.serialize()) for fixture in fixtures.items],
             "next_url": next_url,
             "previous_url": previous_url,
             "current_page": fixtures.page,

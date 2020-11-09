@@ -9,6 +9,7 @@ class Fixture(ModelMixin):
     """
     __tablename__ = 'fixtures'
 
+    name = db.Column(db.String(120))
     date = db.Column(db.DateTime, nullable=False)
     home_team_id = db.Column(db.Integer, nullable=False)
     away_team_id = db.Column(db.Integer, nullable=False)

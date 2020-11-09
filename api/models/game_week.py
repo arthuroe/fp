@@ -9,6 +9,7 @@ class GameWeek(ModelMixin):
     """
     __tablename__ = 'gameweeks'
 
+    name = db.Column(db.String(120))
     date = db.Column(db.DateTime, nullable=False)
     season_id = db.Column(db.Integer, db.ForeignKey(
         'seasons.id'), nullable=False)

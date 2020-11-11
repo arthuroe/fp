@@ -95,10 +95,10 @@ class FantasyLeagueUsersView(MethodView):
         return make_response(jsonify(response)), 200
 
     def post(self, current_user):
-        fantasy_team_id = request.json.get('fantasy_team_id')
-        fantasy_league_id = request.json.get('fantasy_league_id')
-
         try:
+            fantasy_team_id = get_current_user_fantasy_team(current_user)
+            fantasy_league_id = request.json.get('fantasy_league_id')
+
             fantasy_league = FantasyLeague.find_first(id=fantasy_league_id)
             fantasy_team = FantasyTeam.find_first(id=fantasy_team_id)
 
@@ -120,7 +120,7 @@ class FantasyLeagueUsersView(MethodView):
             fantasy_league.save()
             response = {
                 'status': 'Success',
-                'message': (f'Successfully added {fantasy_team.name}'
+                'message': (f'Successfully joined {fantasy_team.name}'
                             f' to {fantasy_league.name}.')
             }
             return make_response(jsonify(response)), 201
@@ -134,7 +134,7 @@ class FantasyLeagueUsersView(MethodView):
             return make_response(jsonify(response)), 500
 
     def delete(self, current_user):
-        fantasy_team_id = request.json.get('fantasy_team_id')
+        fantasy_team_id = get_current_user_fantasy_team(current_user)
         fantasy_league_id = request.json.get('fantasy_league_id')
 
         try:
@@ -159,8 +159,7 @@ class FantasyLeagueUsersView(MethodView):
             fantasy_league.save()
             response = {
                 'status': 'Success',
-                'message': (f'{fantasy_team.name} removed from'
-                            f' {fantasy_league.name}.')
+                'message': f'{fantasy_team.name} left {fantasy_league.name}.'
             }
             return make_response(jsonify(response)), 200
 

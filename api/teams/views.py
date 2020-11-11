@@ -57,9 +57,15 @@ class TeamsView(MethodView):
                     'message': 'Team does not exist'
                 }
                 return make_response(jsonify(response)), 404
+
+            players = team.players
+            players = [player.serialize() for player in players]
+            team = team.serialize()
+            team.update({"players": players})
+
             response = {
                 'status': 'success',
-                'team': team.serialize()
+                'team': team
             }
             return make_response(jsonify(response)), 200
 

@@ -78,7 +78,7 @@ class GameWeekView(MethodView):
 
             response = {
                 'status': 'success',
-                'message': f'Successfully added {game_week.date} gameweek.'
+                'message': f'Successfully added {game_week.name} gameweek.'
             }
             return make_response(jsonify(response)), 201
         except Exception as e:

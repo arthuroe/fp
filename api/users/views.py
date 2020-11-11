@@ -158,22 +158,15 @@ class UserView(MethodView):
                     for favorite_club in user.favorite_clubs.all()
                 ]
 
-            user = {
-                "email": user.email,
-                "fantasy_team_created": user.fantasy_team_created,
-                "uuid": user.uuid,
-                "id": user.id,
-                "is_admin": user.is_admin,
-                "first_name": user.first_name,
-                "last_name": user.last_name,
-                "gender": user.gender,
-                "phone_number": user.phone_number,
-                "receive_club_notifications": user.receive_club_notifications,
-                "photo": user.photo,
-                "fantasy_team_id": fantasy_team_id,
-                "fantasy_team_players_added": fantasy_team_players_added,
-                "favorite_clubs": favorite_clubs
-            }
+            user = user.serialize()
+            del user['password']
+            user.update(
+                {
+                    "favorite_clubs": favorite_clubs,
+                    "fantasy_team_id": fantasy_team_id,
+                    "fantasy_team_players_added": fantasy_team_players_added
+                }
+            )
             response = {
                 'status': 'success',
                 'user': user

@@ -33,10 +33,12 @@ class FixturesView(MethodView):
                 return make_response(jsonify(response)), 404
 
             fixtures = Fixture.filter_by(game_week_id=game_week_id)
+            fixtures = [add_fixture_player_stats(
+                fixture) for fixture in fixtures]
 
             response = {
                 'status': 'success',
-                'fixtures': [fixture.serialize() for fixture in fixtures.all()]
+                'fixtures': [get_team_info(fixture) for fixture in fixtures]
             }
             return make_response(jsonify(response)), 200
 
@@ -45,23 +47,11 @@ class FixturesView(MethodView):
             if not fixture:
                 response = {
                     'status': 'fail',
-                    'message': 'GameWeek does not exist'
+                    'message': 'Fixture does not exist'
                 }
                 return make_response(jsonify(response)), 404
 
-            stats = fixture.player_stats.filter_by(
-                game_week_id=fixture.game_week_id).all()
-
-            serialized_fixture = fixture.serialize()
-            home_team, away_team = get_player_stats(stats, fixture)
-
-            serialized_fixture.update(
-                {
-                    "player_stats": {
-                        "home_team": home_team, "away_team": away_team
-                    }
-                }
-            )
+            serialized_fixture = add_fixture_player_stats(fixture)
             get_team_info(serialized_fixture)
 
             response = {

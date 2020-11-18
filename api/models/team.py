@@ -15,3 +15,11 @@ class Team(ModelMixin):
     jersey = db.Column(db.String(180))
     players = db.relationship(
         "Player", backref="team", lazy="dynamic")
+    home_fixtures = db.relationship(
+        "Fixture", backref="home_team", lazy="dynamic",
+        foreign_keys="Fixture.home_team_id"
+    )
+    away_fixtures = db.relationship(
+        "Fixture", backref="away_team", lazy="dynamic",
+        foreign_keys="Fixture.away_team_id"
+    )

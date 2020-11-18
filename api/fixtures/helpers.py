@@ -1,8 +1,10 @@
 from api.models import Team
 
 
-def get_player_stats(players, fixture):
+def add_fixture_player_stats(fixture):
     home_team, away_team = [], []
+    players = fixture.player_stats.filter_by(
+        game_week_id=fixture.game_week_id).all()
     for player in players:
         player_info = player.player_info.serialize()
         serialized_player = player.serialize()
@@ -11,7 +13,16 @@ def get_player_stats(players, fixture):
             home_team.append(serialized_player)
         if fixture.away_team_id == player.player_info.team.id:
             away_team.append(serialized_player)
-    return home_team, away_team
+
+    serialized_fixture = fixture.serialize()
+    serialized_fixture.update(
+        {
+            "player_stats": {
+                "home_team": home_team, "away_team": away_team
+            }
+        }
+    )
+    return serialized_fixture
 
 
 def get_team_info(fixture):

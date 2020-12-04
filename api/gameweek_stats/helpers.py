@@ -1,3 +1,9 @@
+import logging
+
+from threading import Thread
+
+from flask import make_response, jsonify
+
 from api.models import FantasyTeamPlayers, Player, PlayerGameWeek, FantasyTeamPlayerGameWeek
 
 
@@ -8,7 +14,7 @@ def award_points(**kwargs):
     if kwargs.get('starting_appearance'):
         points += 2
     if kwargs.get('sub_appearance'):
-        points += 2
+        points += 1
     if kwargs.get('man_of_the_match'):
         points += 5
     if kwargs.get('assists'):
@@ -117,3 +123,55 @@ def update_fantasy_player_gameweek(player, gameweek_stats):
                             f"{player} stats in fantasy team {fantasy_team}.")
             }
             return make_response(jsonify(response)), 500
+
+
+def add_initial_player_stats(app, fixtures):
+    with app.app_context():
+        try:
+            for fixture in fixtures:
+                players = []
+                away = fixture.away_team
+                home = fixture.home_team
+                players.extend(away.players.all())
+                players.extend(home.players.all())
+                print(len(players))
+                add_player_stats(players, fixture)
+            return 'Successfully added all player stats'
+        except Exception as e:
+            logging.error(f"An error has occurred  {e}")
+            response = {
+                'status': 'fail',
+                'message': 'Something wrong happened while adding player stats.'
+            }
+            return make_response(jsonify(response)), 500
+
+
+def add_player_stats(players, fixture):
+    try:
+        for player in players:
+            stats = None
+            check_gameweek_stats_exist = PlayerGameWeek.filter_by(
+                player_id=player.id, game_week_id=fixture.game_week_id).all()
+
+            if check_gameweek_stats_exist:
+                stats = check_gameweek_stats_exist[0]
+
+            if not check_gameweek_stats_exist:
+                kwargs = {
+                    "fixture_id": fixture.id,
+                    "game_week_id": fixture.game_week_id,
+                    "player_id": player.id
+                }
+                gameweek_stats = PlayerGameWeek(**kwargs)
+                gameweek_stats.gameweek_points = award_points(**kwargs)
+                gameweek_stats.save()
+                stats = gameweek_stats
+            update_fantasy_player_gameweek(player, stats)
+        return 'Successfully added player fixture player stats'
+    except Exception as e:
+        logging.error(f"An error has occurred  {e}")
+        response = {
+            'status': 'fail',
+            'message': 'Something wrong happened while adding player stats.'
+        }
+        return make_response(jsonify(response)), 500

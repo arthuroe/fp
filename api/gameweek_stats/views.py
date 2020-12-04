@@ -3,9 +3,10 @@ import logging
 from flask import request, make_response, jsonify
 from flask.views import MethodView
 
+from api import app
 from .helpers import *
 from api.decorators import admin_required, token_required
-from api.models import PlayerGameWeek, GameWeek, FantasyTeam, Player, FantasyTeamPlayerGameWeek
+from api.models import PlayerGameWeek, GameWeek, FantasyTeam, Player, FantasyTeamPlayerGameWeek, Season
 
 
 class GameWeekStatsView(MethodView):
@@ -166,6 +167,19 @@ class GameWeekStatsFantasyView(MethodView):
             'status': 'success',
             'fantasy_team_stats': fantasy_team_player_stats,
             "total_points": points
+        }
+        return make_response(jsonify(response)), 200
+
+    @token_required
+    def post(self, current_user, game_week_id):
+        gameweek = GameWeek.find_first(id=game_week_id)
+        fixtures = gameweek.fixtures.all()
+
+        add_initial_player_stats(app, fixtures)
+
+        response = {
+            'status': 'success',
+            'message': 'Stats are being update please wait.'
         }
         return make_response(jsonify(response)), 200
 

@@ -15,6 +15,14 @@ gameweek_stats_blueprint.add_url_rule(
     '/gameweek_stats/<game_week_id>/fantasy_team/<fantasy_team_id>',
     view_func=gameweek_fantasy_stats_view, methods=['GET']
 )
+
+gameweek_fantasy_stats_view = GameWeekStatsFantasyView.as_view(
+    'default_stats_fantasy_api')
+gameweek_stats_blueprint.add_url_rule(
+    '/default_stats/<game_week_id>',
+    view_func=gameweek_fantasy_stats_view, methods=['POST']
+)
+
 gameweek_stats_blueprint.add_url_rule(
     '/gameweek_stats/<game_week_id>/player/<player_id>',
     view_func=gameweek_stats_view, methods=['GET', 'POST', 'PUT', 'DELETE']

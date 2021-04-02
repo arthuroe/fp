@@ -126,8 +126,8 @@ class FixturesView(MethodView):
             fixture.save()
             response = {
                 'status': 'success',
-                'message': f"Successfully added {kwargs.get('home_name')} vs "
-                f"{kwargs.get('away_name')}"
+                'message': f"Successfully added {fixture.home_team.name} vs "
+                f"{fixture.away_team.name}"
             }
             return make_response(jsonify(response)), 201
 

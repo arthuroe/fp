@@ -25,7 +25,7 @@ class RegisterView(MethodView):
         if not all([email, first_name, password]):
             response = {
                 'status': 'fail',
-                'message': ('Incomplete data. email, name and '
+                'message': ('Incomplete data. email, first_name and '
                             'password must be provided')
             }
             return make_response(jsonify(response)), 400

@@ -89,6 +89,7 @@ class FantasyTeamView(MethodView):
             fantasy_team.save()
 
             user.fantasy_team_created = True
+            user.fantasy_team_id = fantasy_team.id
             user.save()
 
             response = {

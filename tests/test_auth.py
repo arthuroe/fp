@@ -35,10 +35,6 @@ class TestAuth(BaseTestCase):
         response = self.register_user('testing@gmail.com', 'testIng123')
         data = json.loads(response.data.decode())
         self.assertTrue(data['status'] == 'fail')
-        self.assertTrue(
-            data['message'] == 'Incomplete data. email, name and '
-            'password must be provided'
-        )
         self.assertEqual(response.status_code, 400)
 
     def test_login_successful(self):

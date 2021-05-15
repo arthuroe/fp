@@ -112,8 +112,6 @@ def update_fantasy_player_gameweek(player, gameweek_stats):
 
             if fantasy_player[0].is_captain:
                 fantasy_player_gameweek[0].points = fantasy_player_gameweek[0].points * 3
-            if fantasy_player[0].is_vice_captain:
-                fantasy_player_gameweek[0].points = fantasy_player_gameweek[0].points * 2
             fantasy_player_gameweek[0].save()
         except Exception as e:
             logging.error(f"An error has occurred  {e}")

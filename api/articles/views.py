@@ -153,3 +153,121 @@ class ArticlesView(MethodView):
                 'message': 'Failed to delete article.'
             }
             return make_response(jsonify(response)), 500
+
+
+class HighlightsView(MethodView):
+    """
+    View to handle highlight
+    """
+
+    def get(self, highlight_id=None):
+        page = request.args.get('page', type=int)
+        limit = request.args.get('limit', type=int)
+        previous_url = ""
+        next_url = ""
+
+        _page = int(page or current_app.config['DEFAULT_PAGE'])
+        _limit = int(limit or current_app.config['PAGE_LIMIT'])
+
+        if highlight_id:
+            article = Article.find_first(id=highlight_id, is_highlight=True)
+            if not article:
+                response = {
+                    'status': 'fail',
+                    'message': 'Highlight does not exist'
+                }
+                return make_response(jsonify(response)), 404
+
+            response = {
+                'status': 'success',
+                'article': article.serialize()
+            }
+            return make_response(jsonify(response)), 200
+
+        articles = Article.filter_by(is_highlight=True).paginate(
+            page=_page, per_page=_limit, error_out=False)
+
+        if not articles.items:
+            response = {
+                'status': 'success',
+                'message': 'No highlights have been added'
+            }
+            return make_response(jsonify(response)), 200
+
+        previous_url = None
+        next_url = None
+
+        if articles.has_next:
+            next_url = url_for(request.endpoint, limit=limit, page=_page + 1)
+        if articles.has_prev:
+            previous_url = url_for(
+                request.endpoint, limit=limit, page=_page - 1)
+
+        response = {
+            'status': 'success',
+            'articles': [article.serialize() for article in articles.items],
+            "next_url": next_url,
+            "previous_url": previous_url,
+            "current_page": articles.page,
+            "count": len(articles.items)
+        }
+        return make_response(jsonify(response)), 200
+
+
+class ArticleView(MethodView):
+    """
+    View to handle articles
+    """
+
+    def get(self, article_id=None):
+        page = request.args.get('page', type=int)
+        limit = request.args.get('limit', type=int)
+        previous_url = ""
+        next_url = ""
+
+        _page = int(page or current_app.config['DEFAULT_PAGE'])
+        _limit = int(limit or current_app.config['PAGE_LIMIT'])
+
+        if article_id:
+            article = Article.find_first(id=article_id, is_highlight=False)
+            if not article:
+                response = {
+                    'status': 'fail',
+                    'message': 'Article does not exist'
+                }
+                return make_response(jsonify(response)), 404
+
+            response = {
+                'status': 'success',
+                'article': article.serialize()
+            }
+            return make_response(jsonify(response)), 200
+
+        articles = Article.filter_by(is_highlight=False).paginate(
+            page=_page, per_page=_limit, error_out=False)
+
+        if not articles.items:
+            response = {
+                'status': 'success',
+                'message': 'No articles have been added'
+            }
+            return make_response(jsonify(response)), 200
+
+        previous_url = None
+        next_url = None
+
+        if articles.has_next:
+            next_url = url_for(request.endpoint, limit=limit, page=_page + 1)
+        if articles.has_prev:
+            previous_url = url_for(
+                request.endpoint, limit=limit, page=_page - 1)
+
+        response = {
+            'status': 'success',
+            'articles': [article.serialize() for article in articles.items],
+            "next_url": next_url,
+            "previous_url": previous_url,
+            "current_page": articles.page,
+            "count": len(articles.items)
+        }
+        return make_response(jsonify(response)), 200

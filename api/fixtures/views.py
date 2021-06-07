@@ -13,7 +13,7 @@ class FixturesView(MethodView):
     View to handle Fixturess
     """
 
-    def get(self, current_user, game_week_id=None, fixture_id=None):
+    def get(self, game_week_id=None, fixture_id=None):
         page = request.args.get('page', type=int)
         limit = request.args.get('limit', type=int)
         previous_url = ""

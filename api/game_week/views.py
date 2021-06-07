@@ -13,7 +13,7 @@ class GameWeekView(MethodView):
     View to handle Game Weeks
     """
 
-    def get(self, current_user, season_id, game_week_id=None):
+    def get(self, season_id, game_week_id=None):
         season = Season.find_first(id=season_id)
         if not season:
             response = {

@@ -1,4 +1,5 @@
 import logging
+import os
 
 from flask import (
     Blueprint, request, redirect, make_response, jsonify, render_template)
@@ -183,6 +184,7 @@ class ChangePasswordView(MethodView):
             return make_response(jsonify(response)), 500
 
 
+
 class ResetPasswordView(MethodView):
     """
     View to reset user password
@@ -193,10 +195,11 @@ class ResetPasswordView(MethodView):
             email = confirm_token(token)
             user = User.find_first(email=email)
             token = user.generate_token(user.id)
+            base_url = os.getenv('FRONT_END_URL')
             return (
                 "", 302,
                 {
-                    "location": "https://fantasy-256.herokuapp.com/",
+                    "location": f"{base_url}/resetpassword",
                     "Authorization": token
                 }
             )
@@ -230,5 +233,49 @@ class ResetPasswordView(MethodView):
             response = {
                 'status': 'fail',
                 'message': 'Failed to send email.'
+            }
+            return make_response(jsonify(response)), 500
+
+    @token_required
+    def put(self, current_user):
+        kwargs = request.json
+        password = kwargs.get('password')
+        confirm_password = kwargs.get('confirm_password')
+
+        try:
+            user = User.find_first(id=current_user.id)
+
+            if not validate_password(password):
+                response = {
+                    'status': 'fail',
+                    'message': 'Invalid password provided',
+                    'required': (
+                        'Passwords should be at least 8 characters, contain'
+                        ' a digit, uppercase and lowercase characters'
+                    )
+                }
+                return make_response(jsonify(response)), 400
+
+
+            if password == confirm_password:
+                response = {
+                    'status': 'fail',
+                    'meassge': 'password and confirmed password do not match.'
+                }
+                return make_response(jsonify(response)), 400
+
+            password = user.hash_password(password)
+            user.update(password=password, id=current_user.id)
+            response = {
+                'status': 'success',
+                'meassge': 'Password successfully updated.'
+            }
+            return make_response(jsonify(response)), 201
+
+        except Exception as e:
+            logging.error(f"An error has occurred  {e}")
+            response = {
+                'status': 'fail',
+                'message': 'Failed to update password please try again.'
             }
             return make_response(jsonify(response)), 500

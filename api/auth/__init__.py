@@ -33,6 +33,12 @@ auth_blueprint.add_url_rule(
 )
 
 auth_blueprint.add_url_rule(
+    '/auth/update_password',
+    view_func=reset_password_view,
+    methods=['PUT']
+)
+
+auth_blueprint.add_url_rule(
     '/auth/reset_password/<token>',
     view_func=reset_password_view,
     methods=['GET']

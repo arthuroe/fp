@@ -199,7 +199,7 @@ class ResetPasswordView(MethodView):
             return (
                 "", 302,
                 {
-                    "location": f"{base_url}/resetpassword",
+                    "location": f"{base_url}/resetpassword?token={token}",
                     "Authorization": token
                 }
             )

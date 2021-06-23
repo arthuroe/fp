@@ -190,7 +190,6 @@ class ResetPasswordView(MethodView):
     """
     View to reset user password
     """
-    decorators = [token_required]
 
     def get(self, token):
         if confirm_token(token):

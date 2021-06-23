@@ -264,7 +264,7 @@ class UpdatePasswordView(MethodView):
                 return make_response(jsonify(response)), 400
 
 
-            if password == confirm_password:
+            if password != confirm_password:
                 response = {
                     'status': 'fail',
                     'meassge': 'password and confirmed password do not match.'

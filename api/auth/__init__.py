@@ -1,7 +1,7 @@
 from flask import Blueprint
 
 from api.auth.views import (
-    RegisterView, LoginView, ChangePasswordView, ResetPasswordView)
+    RegisterView, LoginView, ChangePasswordView, ResetPasswordView, UpdatePasswordView)
 
 auth_blueprint = Blueprint('auth', __name__, url_prefix='/api/v1')
 registration_view = RegisterView.as_view('register_api')
@@ -32,14 +32,10 @@ auth_blueprint.add_url_rule(
     methods=['POST']
 )
 
+
+update_password_view = UpdatePasswordView.as_view('update_password_api')
 auth_blueprint.add_url_rule(
     '/auth/update_password',
-    view_func=reset_password_view,
+    view_func=update_password_view,
     methods=['PUT']
-)
-
-auth_blueprint.add_url_rule(
-    '/auth/reset_password/<token>',
-    view_func=reset_password_view,
-    methods=['GET']
 )

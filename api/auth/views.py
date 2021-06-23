@@ -1,5 +1,6 @@
 import logging
 import os
+import urllib.parse
 
 from flask import (
     Blueprint, request, redirect, make_response, jsonify, render_template)
@@ -189,6 +190,7 @@ class ResetPasswordView(MethodView):
     """
     View to reset user password
     """
+    decorators = [token_required]
 
     def get(self, token):
         if confirm_token(token):
@@ -236,7 +238,13 @@ class ResetPasswordView(MethodView):
             }
             return make_response(jsonify(response)), 500
 
-    @token_required
+
+class UpdatePasswordView(MethodView):
+    """
+    View to update user password
+    """
+    decorators = [token_required]
+
     def put(self, current_user):
         kwargs = request.json
         password = kwargs.get('password')

@@ -8,6 +8,8 @@ class Player(ModelMixin):
     __tablename__ = 'players'
 
     name = db.Column(db.String(120), nullable=False)
+    first_name = db.Column(db.String(120))
+    last_name = db.Column(db.String(120))
     team_id = db.Column(db.Integer, db.ForeignKey('teams.id'), nullable=False)
     position = db.Column(db.String(180))
     age = db.Column(db.Integer)

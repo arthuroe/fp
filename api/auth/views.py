@@ -195,7 +195,7 @@ class ResetPasswordView(MethodView):
         if confirm_token(token):
             email = confirm_token(token)
             user = User.find_first(email=email)
-            token = user.generate_token(user.id)
+            token = user.generate_token(user.id).decode("utf-8")
             base_url = os.getenv('FRONT_END_URL')
             return (
                 "", 302,

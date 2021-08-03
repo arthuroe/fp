@@ -180,10 +180,14 @@ class UserView(MethodView):
             }
             return make_response(jsonify(response)), 500
 
-    def put(self, current_user, user_id):
+    def put(self, current_user):
         kwargs = request.json
+        user_id = current_user.id
         kwargs.update({"id": user_id})
-
+    
+        # TODO
+        # We should do that from one single place
+        # Prevent updating password
         try:
             user = User.find_first(id=user_id)
             if user:

@@ -1,3 +1,5 @@
+import logging
+
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import SQLAlchemyError
@@ -45,9 +47,12 @@ class ModelMixin(db.Model):
         try:
             db.session.add(self)
             db.session.commit()
+            # TODO
+            # Investigate if removing is causing silent SQL ALCHEMY FAILS
             return True
-        except SQLAlchemyError:
+        except SQLAlchemyError as e:
             db.session.rollback()
+            logging.error(f"An error has occurred  {e}")
             return False
 
     @classmethod
@@ -80,6 +85,8 @@ class ModelMixin(db.Model):
         try:
             db.session.delete(self)
             db.session.commit()
+            # TODO
+            # Investigate if removing is causing silent SQL ALCHEMY FAILS
             return True
         except SQLAlchemyError:
             db.session.rollback()
@@ -101,6 +108,8 @@ class ModelMixin(db.Model):
             for key, value in kwargs.items():
                 setattr(record, key, value)
             db.session.commit()
+            # TODO
+            # Investigate if removing is causing silent SQL ALCHEMY FAILS
             return True
         except SQLAlchemyError:
             db.session.rollback()

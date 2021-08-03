@@ -19,10 +19,10 @@ user_view = UserView.as_view('user_api')
 user_blueprint.add_url_rule(
     '/current_user',
     view_func=user_view,
-    methods=['GET']
+    methods=['GET', 'PUT']
 )
-user_blueprint.add_url_rule(
-    '/users',
-    view_func=user_view,
-    methods=['GET']
-)
+# user_blueprint.add_url_rule(
+#     '/users',
+#     view_func=user_view,
+#     methods=['GET']
+# )

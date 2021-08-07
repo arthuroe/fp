@@ -44,6 +44,7 @@ class FantasyLeagueView(MethodView):
     def post(self, current_user):
         post_data = request.json
         name = post_data.get('name')
+        user_id = current_user.id
 
         if not all([name]):
             response = {
@@ -53,8 +54,22 @@ class FantasyLeagueView(MethodView):
             return make_response(jsonify(response)), 400
 
         try:
+            existing_league = FantasyLeague.find_first(name=name)
+            if existing_league:
+                response = {
+                    'status': 'fail',
+                    'message': 'Fantasy league name already exists.'
+                }
+                return make_response(jsonify(response)), 400
+
+
             fantasy_league = FantasyLeague(**post_data)
             fantasy_league.save()
+
+            user_fantasy_team = FantasyTeam.find_first(user_id=user_id)
+            fantasy_league.fantasy_teams.append(user_fantasy_team)
+            fantasy_league.save()
+
             response = {
                 'status': 'success',
                 'message': f'Successfully added {name}'
@@ -73,24 +88,33 @@ class FantasyLeagueUsersView(MethodView):
     """View to handle Fantasy League for users"""
     decorators = [token_required]
 
-    def get(self, current_user, fantasy_league_id):
-        league = FantasyLeague.find_first(id=fantasy_league_id)
-        if not league:
+    def get(self, current_user, fantasy_league_id=None):
+        user_id = current_user.id
+        if fantasy_league_id:
+            league = FantasyLeague.find_first(id=fantasy_league_id)
+            if not league:
+                response = {
+                    'status': 'fail',
+                    'message': 'League does not exist'
+                }
+                return make_response(jsonify(response)), 404
+
+            league_teams = FantasyLeagueTeam.filter_by(
+                fantasyleague_id=fantasy_league_id).order_by(
+                    FantasyLeagueTeam.points.desc())
+
+            all_teams = get_fantasy_team_info(league_teams)
             response = {
-                'status': 'fail',
-                'message': 'League does not exist'
+            'status': 'success',
+            'league_teams': all_teams
             }
-            return make_response(jsonify(response)), 404
-
-        league_teams = FantasyLeagueTeam.filter_by(
-            fantasyleague_id=fantasy_league_id).order_by(
-                FantasyLeagueTeam.points.desc())
-
-        all_teams = get_fantasy_team_info(league_teams)
+            return make_response(jsonify(response)), 200
+        
+        user_fantasy_leagues = FantasyLeague.query.join(FantasyLeague.fantasy_teams).filter(user_id == user_id).all()
 
         response = {
             'status': 'success',
-            'league_teams': all_teams
+            'league_teams': [league.serialize() for league in user_fantasy_leagues]
         }
         return make_response(jsonify(response)), 200
 

@@ -226,11 +226,11 @@ class TeamOfWeekView(MethodView):
                 team.append(player_info)
             team_of_the_week = team
 
-        response = {
-            'status': 'success',
-            'team': team_of_the_week
-        }
-        return make_response(jsonify(response)), 200
+            response = {
+                'status': 'success',
+                'team': team_of_the_week
+            }
+            return make_response(jsonify(response)), 200
 
         response = {
             'status': 'success',

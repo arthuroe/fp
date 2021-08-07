@@ -23,3 +23,7 @@ fantasy_league_blueprint.add_url_rule(
     '/view_fantasy_league/<fantasy_league_id>',
     view_func=fantasy_league_user_view, methods=['GET']
 )
+fantasy_league_blueprint.add_url_rule(
+    '/view_fantasy_leagues',
+    view_func=fantasy_league_user_view, methods=['GET']
+)

@@ -114,7 +114,7 @@ class FantasyLeagueUsersView(MethodView):
 
         response = {
             'status': 'success',
-            'league_teams': [league.serialize() for league in user_fantasy_leagues]
+            'leagues': [league.serialize() for league in user_fantasy_leagues]
         }
         return make_response(jsonify(response)), 200
 

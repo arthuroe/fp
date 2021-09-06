@@ -13,3 +13,4 @@ class FantasyTeamPlayers(ModelMixin):
     is_sub = db.Column(db.Boolean, default=False)
     is_captain = db.Column(db.Boolean, default=False)
     is_vice_captain = db.Column(db.Boolean, default=False)
+    player_order = db.Column(db.Integer, default=0)

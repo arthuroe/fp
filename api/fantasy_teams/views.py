@@ -183,6 +183,7 @@ class PlayerFantasyTeamView(MethodView):
     def post(self, current_user, fantasy_team_id):
         user_id = current_user.id
         player_id = request.json.get('player_id')
+        player_order = request.json.get('player_order')
 
         try:
             fantasy_team = FantasyTeam.find_first(user_id=user_id)
@@ -226,6 +227,10 @@ class PlayerFantasyTeamView(MethodView):
 
             fantasy_team.players.append(player)
             fantasy_team.money -= player.price
+
+            fantasy_team_player = FantasyTeamPlayers.filter_by(fantasyteam_id=fantasy_team.id, player_id=player_id).all()[0]
+            fantasy_team_player.player_order = player_order
+            fantasy_team_player.save()
             fantasy_team.save()
             response = {
                 'status': 'success',
@@ -259,6 +264,7 @@ class PlayerFantasyTeamView(MethodView):
             for transfer in transfers:
                 incoming_player_id = transfer.get('incoming_player_id')
                 current_player_id = transfer.get('current_player_id')
+                player_order = transfer.get('player_order')
                 player = Player.find_first(id=incoming_player_id)
                 current_player = Player.find_first(id=current_player_id)
 
@@ -283,6 +289,10 @@ class PlayerFantasyTeamView(MethodView):
 
                 fantasy_team.players.append(player)
                 fantasy_team.money -= player.price
+
+                fantasy_team_player = FantasyTeamPlayers.filter_by(fantasyteam_id=fantasy_team.id, player_id=incoming_player_id).all()[0]
+                fantasy_team_player.player_order = player_order
+                fantasy_team_player.save()
 
             fantasy_team.save()
             response = {
@@ -331,141 +341,141 @@ class PlayerFantasyTeamView(MethodView):
             return make_response(jsonify(response)), 500
 
 
-class CaptainView(MethodView):
-    """
-    View to handle Fantasy Team Captains
-    """
-    decorators = [token_required]
+# class CaptainView(MethodView):
+#     """
+#     View to handle Fantasy Team Captains
+#     """
+#     decorators = [token_required]
 
-    def get(self, current_user):
-        fantasy_team = FantasyTeam.find_first(user_id=current_user.id)
-        captain = fantasy_team.captain
+#     def get(self, current_user):
+#         fantasy_team = FantasyTeam.find_first(user_id=current_user.id)
+#         captain = fantasy_team.captain
 
-        if not captain:
-            response = {
-                'status': 'success',
-                'message': f'{fantasy_team.name} has no captain.'
-            }
-            return make_response(jsonify(response)), 200
+#         if not captain:
+#             response = {
+#                 'status': 'success',
+#                 'message': f'{fantasy_team.name} has no captain.'
+#             }
+#             return make_response(jsonify(response)), 200
 
-        player = Player.find_first(id=captain)
-        response = {
-            'status': 'success',
-            'player': player.serialize()
-        }
-        return make_response(jsonify(response)), 200
+#         player = Player.find_first(id=captain)
+#         response = {
+#             'status': 'success',
+#             'player': player.serialize()
+#         }
+#         return make_response(jsonify(response)), 200
 
-    def post(self, current_user):
-        fantasy_team = FantasyTeam.find_first(user_id=current_user.id)
-        player_id = request.json.get('player_id')
-        player = Player.find_first(id=player_id)
+#     def post(self, current_user):
+#         fantasy_team = FantasyTeam.find_first(user_id=current_user.id)
+#         player_id = request.json.get('player_id')
+#         player = Player.find_first(id=player_id)
 
-        if not player:
-            response = {
-                'status': 'fail',
-                'message': 'Player does not exist'
-            }
-            return make_response(jsonify(response)), 404
+#         if not player:
+#             response = {
+#                 'status': 'fail',
+#                 'message': 'Player does not exist'
+#             }
+#             return make_response(jsonify(response)), 404
 
-        if player_id == fantasy_team.vice_captain:
-            response = {
-                'status': 'fail',
-                'message': 'Player is already vice captain.'
-            }
-            return make_response(jsonify(response)), 400
+#         if player_id == fantasy_team.vice_captain:
+#             response = {
+#                 'status': 'fail',
+#                 'message': 'Player is already vice captain.'
+#             }
+#             return make_response(jsonify(response)), 400
 
-        if player not in fantasy_team.players:
-            response = {
-                'status': 'fail',
-                'message': 'Player not in fantasy team.'
-            }
-            return make_response(jsonify(response)), 400
+#         if player not in fantasy_team.players:
+#             response = {
+#                 'status': 'fail',
+#                 'message': 'Player not in fantasy team.'
+#             }
+#             return make_response(jsonify(response)), 400
 
-        try:
-            fantasy_team.captain = player_id
-            fantasy_team.save()
-            response = {
-                'status': 'success',
-                'message': f'Successfully added {player.name} as captain.'
-            }
-            return make_response(jsonify(response)), 201
+#         try:
+#             fantasy_team.captain = player_id
+#             fantasy_team.save()
+#             response = {
+#                 'status': 'success',
+#                 'message': f'Successfully added {player.name} as captain.'
+#             }
+#             return make_response(jsonify(response)), 201
 
-        except Exception as e:
-            logging.error(f"An error has occurred  {e}")
-            response = {
-                'status': 'fail',
-                'message': 'Failed to add player as captain.'
-            }
-            return make_response(jsonify(response)), 500
+#         except Exception as e:
+#             logging.error(f"An error has occurred  {e}")
+#             response = {
+#                 'status': 'fail',
+#                 'message': 'Failed to add player as captain.'
+#             }
+#             return make_response(jsonify(response)), 500
 
 
-class ViceCaptainView(MethodView):
-    """
-    View to handle Fantasy Team Vice Captains
-    """
-    decorators = [token_required]
+# class ViceCaptainView(MethodView):
+#     """
+#     View to handle Fantasy Team Vice Captains
+#     """
+#     decorators = [token_required]
 
-    def get(self, current_user):
-        fantasy_team = FantasyTeam.find_first(user_id=current_user.id)
-        vice_captain = fantasy_team.vice_captain
+#     def get(self, current_user):
+#         fantasy_team = FantasyTeam.find_first(user_id=current_user.id)
+#         vice_captain = fantasy_team.vice_captain
 
-        if not vice_captain:
-            response = {
-                'status': 'success',
-                'message': f'{fantasy_team.name} has no vice captain.'
-            }
-            return make_response(jsonify(response)), 200
+#         if not vice_captain:
+#             response = {
+#                 'status': 'success',
+#                 'message': f'{fantasy_team.name} has no vice captain.'
+#             }
+#             return make_response(jsonify(response)), 200
 
-        player = Player.find_first(id=vice_captain)
-        response = {
-            'status': 'success',
-            'player': player.serialize()
-        }
-        return make_response(jsonify(response)), 200
+#         player = Player.find_first(id=vice_captain)
+#         response = {
+#             'status': 'success',
+#             'player': player.serialize()
+#         }
+#         return make_response(jsonify(response)), 200
 
-    def post(self, current_user):
-        fantasy_team = FantasyTeam.find_first(user_id=current_user.id)
-        player_id = request.json.get('player_id')
-        player = Player.find_first(id=player_id)
+#     def post(self, current_user):
+#         fantasy_team = FantasyTeam.find_first(user_id=current_user.id)
+#         player_id = request.json.get('player_id')
+#         player = Player.find_first(id=player_id)
 
-        if not player:
-            response = {
-                'status': 'fail',
-                'message': 'Player does not exist'
-            }
-            return make_response(jsonify(response)), 404
+#         if not player:
+#             response = {
+#                 'status': 'fail',
+#                 'message': 'Player does not exist'
+#             }
+#             return make_response(jsonify(response)), 404
 
-        if player not in fantasy_team.players:
-            response = {
-                'status': 'fail',
-                'message': 'Player not in fantasy team.'
-            }
-            return make_response(jsonify(response)), 400
+#         if player not in fantasy_team.players:
+#             response = {
+#                 'status': 'fail',
+#                 'message': 'Player not in fantasy team.'
+#             }
+#             return make_response(jsonify(response)), 400
 
-        if player_id == fantasy_team.captain:
-            response = {
-                'status': 'fail',
-                'message': 'Player is already captain.'
-            }
-            return make_response(jsonify(response)), 400
+#         if player_id == fantasy_team.captain:
+#             response = {
+#                 'status': 'fail',
+#                 'message': 'Player is already captain.'
+#             }
+#             return make_response(jsonify(response)), 400
 
-        try:
-            fantasy_team.vice_captain = player_id
-            fantasy_team.save()
-            response = {
-                'status': 'success',
-                'message': (f'Successfully added {player.name} as'
-                            ' vice_captain.')
-            }
-            return make_response(jsonify(response)), 201
+#         try:
+#             fantasy_team.vice_captain = player_id
+#             fantasy_team.save()
+#             response = {
+#                 'status': 'success',
+#                 'message': (f'Successfully added {player.name} as'
+#                             ' vice_captain.')
+#             }
+#             return make_response(jsonify(response)), 201
 
-        except Exception as e:
-            logging.error(f"An error has occurred  {e}")
-            response = {
-                'status': 'fail',
-                'message': 'Failed to add player as vice captain.'
-            }
-            return make_response(jsonify(response)), 500
+#         except Exception as e:
+#             logging.error(f"An error has occurred  {e}")
+#             response = {
+#                 'status': 'fail',
+#                 'message': 'Failed to add player as vice captain.'
+#             }
+#             return make_response(jsonify(response)), 500
 
 
 class StartingPlayersView(MethodView):
@@ -506,6 +516,7 @@ class StartingPlayersView(MethodView):
                 fantasy_team_player.is_captain = player.get('is_captain', False)
                 fantasy_team_player.is_vice_captain = player.get(
                     'is_vice_captain', False)
+                fantasy_team_player.player_order = player.get('player_order')
                 fantasy_team_player.is_sub = player.get('is_sub', False)
                 fantasy_team_player.save()
 
@@ -525,7 +536,9 @@ class StartingPlayersView(MethodView):
     def put(self, current_user):
         kwargs = request.json
         player_to_start = kwargs.get('player_to_start')
+        player_to_start_order = kwargs.get('player_to_start_order')
         player_to_sub = kwargs.get('player_to_sub')
+        player_to_sub_order= kwargs.get('player_to_sub_order')
 
         if not all([player_to_start, player_to_sub]):
             response = {
@@ -539,11 +552,13 @@ class StartingPlayersView(MethodView):
             player_to_start = FantasyTeamPlayers.find_first(
                 fantasyteam_id=fantasy_team.id, player_id=player_to_start)
             player_to_start.is_sub = False
+            player_to_start.player_order = player_to_start_order
             player_to_start.save()
 
             player_to_sub = FantasyTeamPlayers.find_first(
                 fantasyteam_id=fantasy_team.id, player_id=player_to_sub)
             player_to_sub.is_sub = True
+            player_to_sub.player_order = player_to_sub_order
             player_to_sub.save()
 
             response = {

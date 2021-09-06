@@ -1,8 +1,9 @@
 from flask import Blueprint
 
 from .views import (
-    FantasyTeamView, PlayerFantasyTeamView, CaptainView, ViceCaptainView,
-    StartingPlayersView, AddMultiplePlayerView
+    FantasyTeamView, PlayerFantasyTeamView,
+    StartingPlayersView, AddMultiplePlayerView,
+    # CaptainView, ViceCaptainView,
 )
 
 fantasy_team_blueprint = Blueprint(
@@ -24,21 +25,21 @@ fantasy_team_blueprint.add_url_rule(
     methods=['GET', 'POST', 'PUT', 'DELETE']
 )
 
-fantasy_team_captain_view = CaptainView.as_view(
-    'fantasy_team_captain_api')
-fantasy_team_blueprint.add_url_rule(
-    '/fantasy_team_captain',
-    view_func=fantasy_team_captain_view,
-    methods=['GET', 'POST']
-)
+# fantasy_team_captain_view = CaptainView.as_view(
+#     'fantasy_team_captain_api')
+# fantasy_team_blueprint.add_url_rule(
+#     '/fantasy_team_captain',
+#     view_func=fantasy_team_captain_view,
+#     methods=['GET', 'POST']
+# )
 
-fantasy_team_vice_captain_view = ViceCaptainView.as_view(
-    'fantasy_team_vice_captain_api')
-fantasy_team_blueprint.add_url_rule(
-    '/fantasy_team_vice_captain',
-    view_func=fantasy_team_vice_captain_view,
-    methods=['GET', 'POST']
-)
+# fantasy_team_vice_captain_view = ViceCaptainView.as_view(
+#     'fantasy_team_vice_captain_api')
+# fantasy_team_blueprint.add_url_rule(
+#     '/fantasy_team_vice_captain',
+#     view_func=fantasy_team_vice_captain_view,
+#     methods=['GET', 'POST']
+# )
 
 starting_players_view = StartingPlayersView.as_view(
     'starting_players_api')

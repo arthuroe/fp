@@ -27,6 +27,7 @@ from api.seasons import seasons_blueprint
 from api.teams import teams_blueprint
 from api.users import user_blueprint
 from api.gameweek_stats import gameweek_stats_blueprint
+from api.user_fantasy_team_gameweek import user_fantasy_team_gameweek_blueprint
 
 
 db.init_app(app)
@@ -42,6 +43,7 @@ app.register_blueprint(fixtures_blueprint)
 app.register_blueprint(game_week_blueprint)
 app.register_blueprint(user_blueprint)
 app.register_blueprint(gameweek_stats_blueprint)
+app.register_blueprint(user_fantasy_team_gameweek_blueprint)
 
 
 from api.tasks import update_current_game_week

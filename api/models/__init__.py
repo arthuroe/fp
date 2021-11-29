@@ -16,11 +16,12 @@ from .player_gameweek import PlayerGameWeek
 from .season import Season
 from .team import Team
 from .user import User
+from .user_fantasy_team_gameweek import UserFantasyTeamGameWeek
 
 
 tables = [
     Article, FantasyLeague, FantasyLeagueTeam, FantasyTeam, Fixture, GameWeek,
-    Player, Season, Team, User
+    Player, Season, Team, User, UserFantasyTeamGameWeek
 ]
 
 

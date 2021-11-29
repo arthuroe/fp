@@ -28,4 +28,4 @@ def check_date(date):
     return (
         today.isocalendar()[1] == date.isocalendar()[1] and
         today.year == date.year
-    )
+    )                                                                                                                                                                                                                                                         

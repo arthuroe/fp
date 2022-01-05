@@ -46,6 +46,7 @@ class GameWeekStatsView(MethodView):
     def post(self, current_user, game_week_id, player_id):
         kwargs = request.json
         kwargs.update({"game_week_id": game_week_id, "player_id": player_id})
+        print("Player stats being added", kwargs)
 
         try:
             check_gameweek_stats_exist = PlayerGameWeek.filter_by(
@@ -85,13 +86,15 @@ class GameWeekStatsView(MethodView):
     def put(self, current_user, game_week_id, player_id):
         kwargs = request.json
         kwargs.update({"game_week_id": game_week_id, "player_id": player_id})
-
+        print("Player stats being added", kwargs)
+        
         try:
             stats = PlayerGameWeek.filter_by(
                 player_id=player_id, game_week_id=game_week_id).all()[0]
 
             stat_id = stats.id
             stat = PlayerGameWeek.find_first(id=stat_id)
+            kwargs.update({"id": stat_id})
             stat.update(**kwargs)
             stat.gameweek_points = award_points(**kwargs)
             stat.save()
@@ -173,6 +176,13 @@ class GameWeekStatsFantasyView(MethodView):
     @token_required
     def post(self, current_user, game_week_id):
         gameweek = GameWeek.find_first(id=game_week_id)
+        if not gameweek:
+            response = {
+                'status': 'fail',
+                'message': 'GameWeek does not exist'
+            }
+            return make_response(jsonify(response)), 404
+            
         fixtures = gameweek.fixtures.all()
 
         add_initial_player_stats(app, fixtures)

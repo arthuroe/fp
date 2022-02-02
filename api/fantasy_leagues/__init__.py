@@ -1,6 +1,6 @@
 from flask import Blueprint
 
-from .views import FantasyLeagueView, FantasyLeagueUsersView
+from .views import FantasyLeagueView, FantasyLeagueUsersView, GlobalFanstayLeagueView
 
 fantasy_league_blueprint = Blueprint(
     'fantasy_leagues', __name__, url_prefix='/api/v1')
@@ -26,4 +26,10 @@ fantasy_league_blueprint.add_url_rule(
 fantasy_league_blueprint.add_url_rule(
     '/view_fantasy_leagues',
     view_func=fantasy_league_user_view, methods=['GET']
+)
+
+global_league_view = GlobalFanstayLeagueView.as_view('global_league_api')
+fantasy_league_blueprint.add_url_rule(
+    '/view_global_league',
+    view_func=global_league_view, methods=['GET']
 )

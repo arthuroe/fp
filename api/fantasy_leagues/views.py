@@ -1,4 +1,5 @@
 import logging
+from api.models.season import Season
 
 from flask import request, make_response, jsonify
 from flask.views import MethodView
@@ -62,7 +63,6 @@ class FantasyLeagueView(MethodView):
                 }
                 return make_response(jsonify(response)), 400
 
-
             fantasy_league = FantasyLeague(**post_data)
             fantasy_league.save()
 
@@ -104,13 +104,17 @@ class FantasyLeagueUsersView(MethodView):
                     FantasyLeagueTeam.points.desc())
 
             all_teams = get_fantasy_team_info(league_teams)
+            sorted_teams = sorted(
+                all_teams, key=lambda i: i['points'], reverse=True)
             response = {
-            'status': 'success',
-            'league_teams': all_teams
+                'status': 'success',
+                'league_teams': sorted_teams
             }
             return make_response(jsonify(response)), 200
-        
-        user_fantasy_leagues = FantasyLeague.query.join(FantasyLeague.fantasy_teams).filter(user_id == user_id).all()
+
+        user_fantasy_leagues = FantasyLeague.query.join(
+            FantasyTeam, FantasyLeague.fantasy_teams
+        ).filter(FantasyTeam.user_id == user_id).all()
 
         response = {
             'status': 'success',
@@ -194,3 +198,23 @@ class FantasyLeagueUsersView(MethodView):
                 'message': f'Error removing team from league.'
             }
             return make_response(jsonify(response)), 500
+
+
+class GlobalFanstayLeagueView(MethodView):
+    """View to handle Fantasy League for users"""
+    decorators = [token_required]
+
+    def get(self, current_user):
+        user_id = current_user.id
+
+        current_season = Season.find_first(is_current=True)
+        fantasy_teams = FantasyTeam.filter_by(season_id=current_season.id)
+
+        all_teams = get_global_fantasy_team_info(fantasy_teams)
+        sorted_teams = sorted(
+            all_teams, key=lambda i: i['points'], reverse=True)
+        response = {
+            'status': 'success',
+            'all_teams': sorted_teams
+        }
+        return make_response(jsonify(response)), 200

@@ -1,5 +1,5 @@
 from flask import make_response, jsonify
-from api.models import GameWeek, FantasyTeam, UserFantasyTeamGameWeek
+from api.models import GameWeek, FantasyTeam, UserFantasyTeamGameWeek, fantasy_team
 from sqlalchemy.sql import func
 
 
@@ -7,6 +7,7 @@ def get_fantasy_team_info(league_teams):
     teams = []
     current_gameweek = GameWeek.find_first(is_current=True)
     for team in league_teams:
+        fantasy_team_id = team.fantasyteam_id
         team_sum = UserFantasyTeamGameWeek.query.with_entities(
             func.sum(UserFantasyTeamGameWeek.points).label('sum')
         ).filter(
@@ -22,7 +23,7 @@ def get_fantasy_team_info(league_teams):
             team['points'] = team_sum[0][0]
 
         current_gameweek_points = get_current_gameweek_points(
-            team.id, current_gameweek.id)
+            fantasy_team_id, current_gameweek.id)
         team['current_gameweek_points'] = current_gameweek_points
         teams.append(team)
 

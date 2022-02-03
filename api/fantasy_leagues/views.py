@@ -46,6 +46,8 @@ class FantasyLeagueView(MethodView):
         post_data = request.json
         name = post_data.get('name')
         user_id = current_user.id
+        code = generate_league_code()
+        post_data.update({'code': code})
 
         if not all([name]):
             response = {
@@ -72,7 +74,8 @@ class FantasyLeagueView(MethodView):
 
             response = {
                 'status': 'success',
-                'message': f'Successfully added {name}'
+                'message': f'Successfully added {name}',
+                'code': code
             }
             return make_response(jsonify(response)), 201
         except Exception as e:

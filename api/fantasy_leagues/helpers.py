@@ -1,6 +1,12 @@
+import uuid
+
 from flask import make_response, jsonify
 from api.models import GameWeek, FantasyTeam, UserFantasyTeamGameWeek, fantasy_team
 from sqlalchemy.sql import func
+
+
+def generate_league_code():
+    return str(uuid.uuid4())[:8]
 
 
 def get_fantasy_team_info(league_teams):

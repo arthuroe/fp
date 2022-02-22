@@ -128,9 +128,16 @@ class FantasyLeagueUsersView(MethodView):
     def post(self, current_user):
         try:
             fantasy_team_id = get_current_user_fantasy_team(current_user)
-            fantasy_league_id = request.json.get('fantasy_league_id')
+            fantasy_league_code = request.json.get('fantasy_league_code')
 
-            fantasy_league = FantasyLeague.find_first(id=fantasy_league_id)
+            if not fantasy_league_code:
+                response = {
+                    'status': 'fail',
+                    'message': 'Fanstasy league code required.'
+                }
+                return make_response(jsonify(response)), 404
+
+            fantasy_league = FantasyLeague.find_first(code=fantasy_league_code)
             fantasy_team = FantasyTeam.find_first(id=fantasy_team_id)
 
             if not fantasy_team or not fantasy_league:

@@ -1,7 +1,7 @@
 import logging
 from api.models.season import Season
 
-from flask import request, make_response, jsonify
+from flask import current_app, request, make_response, jsonify, url_for
 from flask.views import MethodView
 
 from .helpers import *
@@ -14,6 +14,14 @@ class FantasyLeagueView(MethodView):
     decorators = [token_required]
 
     def get(self, current_user, league_id=None):
+        page = request.args.get('page', type=int)
+        limit = request.args.get('limit', type=int)
+        previous_url = ""
+        next_url = ""
+
+        _page = int(page or current_app.config['DEFAULT_PAGE'])
+        _limit = int(limit or current_app.config['PAGE_LIMIT'])
+
         if league_id:
             league = FantasyLeague.find_first(id=league_id)
             if not league:
@@ -28,17 +36,34 @@ class FantasyLeagueView(MethodView):
             }
             return make_response(jsonify(response)), 200
 
-        leagues = FantasyLeague.fetch_all()
-        if not leagues:
+        leagues = FantasyLeague.paginate(
+            page=_page, per_page=_limit, error_out=False)
+
+        if not leagues.items:
             response = {
                 'status': 'success',
                 'message': 'No leagues have been added'
             }
             return make_response(jsonify(response)), 200
 
+
+        previous_url = None
+        next_url = None
+
+        if leagues.has_next:
+            next_url = url_for(request.endpoint, limit=limit, page=_page + 1)
+        if leagues.has_prev:
+            previous_url = url_for(
+                request.endpoint, limit=limit, page=_page - 1)
+
+
         response = {
             'status': 'success',
-            'leagues': [league.serialize() for league in leagues]
+            'leagues': [league.serialize() for league in leagues.items],
+            "next_url": next_url,
+            "previous_url": previous_url,
+            "current_page": leagues.page,
+            "count": len(leagues.items)
         }
         return make_response(jsonify(response)), 200
 
@@ -92,7 +117,15 @@ class FantasyLeagueUsersView(MethodView):
     decorators = [token_required]
 
     def get(self, current_user, fantasy_league_id=None):
+        page = request.args.get('page', type=int)
+        limit = request.args.get('limit', type=int)
+        previous_url = ""
+        next_url = ""
         user_id = current_user.id
+
+        _page = int(page or current_app.config['DEFAULT_PAGE'])
+        _limit = int(limit or current_app.config['PAGE_LIMIT'])
+
         if fantasy_league_id:
             league = FantasyLeague.find_first(id=fantasy_league_id)
             if not league:
@@ -104,24 +137,42 @@ class FantasyLeagueUsersView(MethodView):
 
             league_teams = FantasyLeagueTeam.filter_by(
                 fantasyleague_id=fantasy_league_id).order_by(
-                    FantasyLeagueTeam.points.desc())
+                    FantasyLeagueTeam.points.desc()).paginate(
+                        page=_page, per_page=_limit, error_out=False
+                    )
 
-            all_teams = get_fantasy_team_info(league_teams)
+            previous_url = None
+            next_url = None
+
+            if league_teams.has_next:
+                next_url = url_for(request.endpoint, limit=limit, page=_page + 1)
+            if league_teams.has_prev:
+                previous_url = url_for(
+                    request.endpoint, limit=limit, page=_page - 1)
+
+            all_teams = get_fantasy_team_info(league_teams.items)
             sorted_teams = sorted(
                 all_teams, key=lambda i: i['points'], reverse=True)
             response = {
                 'status': 'success',
-                'league_teams': sorted_teams
+                'league_teams': sorted_teams,
+                "next_url": next_url,
+                "previous_url": previous_url,
+                "current_page": league_teams.page,
+                "count": len(league_teams.items)   
             }
             return make_response(jsonify(response)), 200
 
+        fantasy_team = FantasyTeam.find_first(user_id=user_id)
         user_fantasy_leagues = FantasyLeague.query.join(
             FantasyTeam, FantasyLeague.fantasy_teams
         ).filter(FantasyTeam.user_id == user_id).all()
 
+        leagues = [serialize_and_add_position(fantasy_team, league.serialize()) for league in user_fantasy_leagues]
+
         response = {
             'status': 'success',
-            'leagues': [league.serialize() for league in user_fantasy_leagues]
+            'leagues': leagues
         }
         return make_response(jsonify(response)), 200
 

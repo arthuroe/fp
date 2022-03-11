@@ -1,7 +1,7 @@
 import uuid
 
 from flask import make_response, jsonify
-from api.models import GameWeek, FantasyTeam, UserFantasyTeamGameWeek, fantasy_team
+from api.models import GameWeek, FantasyTeam, UserFantasyTeamGameWeek, FantasyLeagueTeam
 from sqlalchemy.sql import func
 
 
@@ -76,3 +76,14 @@ def get_current_user_fantasy_team(current_user):
         return make_response(jsonify(response)), 400
 
     return current_user.fantasy_team.all()[0].id
+
+def serialize_and_add_position(fantasy_team, league):
+    league_teams = FantasyLeagueTeam.filter_by(
+                fantasyleague_id=league['id']).order_by(
+                    FantasyLeagueTeam.points.desc()).all()
+    league_team = FantasyLeagueTeam.find_first(
+                fantasyleague_id=league['id'], fantasyteam_id = fantasy_team.id)
+    position = league_teams.index(league_team) + 1
+    league.update({"team_position": position})
+    return league
+    

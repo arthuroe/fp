@@ -97,7 +97,39 @@ class ManageUserView(MethodView):
             return make_response(jsonify(response)), 409
 
     @token_required
-    @admin_required
+    @admin_required 
+    def put(self, current_user, user_id):
+        kwargs = request.json
+        kwargs.update({"id": user_id})
+    
+        # TODO
+        # We should do that from one single place
+        # Prevent updating password
+        try:
+            user = User.find_first(id=user_id)
+            if user:
+                user.update(**kwargs)
+
+                response = {
+                    'status': 'success',
+                    'message': f'Successfully updated {user.first_name}.'
+                }
+                return make_response(jsonify(response)), 201
+
+            response = {
+                'status': 'fail',
+                'message': 'User does not exist.',
+            }
+            return make_response(jsonify(response)), 400
+        except Exception as e:
+            logging.error(f"An error has occurred  {e}")
+            response = {
+                'status': 'fail',
+                'message': 'Update failed. Please try again.'
+            }
+            return make_response(jsonify(response)), 500
+
+    @token_required
     def delete(self, current_user, user_id):
         try:
             user = User.find_first(id=user_id)

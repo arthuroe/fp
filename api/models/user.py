@@ -27,7 +27,9 @@ class User(ModelMixin):
     points_deductible = db.Column(db.Integer, default=0)
     fantasy_team_created = db.Column(db.Boolean, default=False)
     fantasy_team = db.relationship(
-        'FantasyTeam', backref='user', lazy='dynamic')
+        'FantasyTeam', backref='user', lazy='dynamic', 
+        cascade = "all, delete, delete-orphan"
+    )
     favorite_clubs = db.relationship(
         "Team", secondary="user_teams", backref='users_following',
         lazy="dynamic"

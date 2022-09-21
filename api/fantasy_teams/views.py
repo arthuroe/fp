@@ -59,6 +59,10 @@ class FantasyTeamView(MethodView):
             }
             return make_response(jsonify(response)), 400
 
+        # Adding this to log requests sent from the clients
+        logging.info(kwargs)
+        print(kwargs)
+
         try:
             duplicate_fantasy_teams = FantasyTeam.find_first(name=name)
 

@@ -5,7 +5,7 @@ from flask.views import MethodView
 
 from .helpers import *
 from api.decorators import admin_required, token_required
-from api.models import Fixture, GameWeek
+from api.models import Fixture, GameWeek, Team
 
 
 class FixturesView(MethodView):
@@ -93,9 +93,13 @@ class FixturesView(MethodView):
     def post(self, current_user):
         kwargs = request.json
         game_week_id = kwargs.get('game_week_id')
+
         try:
             fixture = Fixture(**kwargs)
             game_week = GameWeek.find_first(id=game_week_id)
+
+            home_team = Team.find_first(id=kwargs.get('home_team_id'))
+            away_team = Team.find_first(id=kwargs.get('away_team_id'))
 
             if not game_week:
                 response = {
@@ -111,12 +115,14 @@ class FixturesView(MethodView):
                 }
                 return make_response(jsonify(response)), 400
 
+            name = f"{(home_team.name).capitalize()} vs {(away_team.name).capitalize()}"
+            fixture.name = name
             game_week.fixtures.append(fixture)
             fixture.save()
             response = {
                 'status': 'success',
-                'message': f"Successfully added {fixture.home_team.name} vs "
-                f"{fixture.away_team.name}"
+                'message': f"Successfully added {home_team.name} vs "
+                f"{away_team.name}"
             }
             return make_response(jsonify(response)), 201
 

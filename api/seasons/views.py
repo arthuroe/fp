@@ -72,6 +72,7 @@ class SeasonsView(MethodView):
 
             season = Season(name=name, start_date=start_date,
                             end_date=end_date, logo=logo)
+            season.id = True
             season.save()
             response = {
                 'status': 'success',

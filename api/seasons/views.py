@@ -1,4 +1,5 @@
 import logging
+from xmlrpc.client import Boolean
 
 from flask import request, make_response, jsonify
 from flask.views import MethodView
@@ -72,7 +73,7 @@ class SeasonsView(MethodView):
 
             season = Season(name=name, start_date=start_date,
                             end_date=end_date, logo=logo)
-            season.id = True
+            season.is_current = True
             season.save()
             response = {
                 'status': 'success',

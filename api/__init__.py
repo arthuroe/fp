@@ -53,7 +53,8 @@ sched.add_job(update_current_game_week,'interval', days=3)
 sched.start()
 
 # add support for CORS for all end points
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "*"}})
+
 
 @app.route('/')
 def index():

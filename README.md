@@ -1,44 +1,122 @@
 [![Build Status](https://travis-ci.com/arthuroe/fp.svg?token=UkY1KBXLvhKhX8CgS2Jn&branch=develop)](https://travis-ci.com/arthuroe/fp)
 
-### Fantasy Rugby
+# Fantasy Rugby API
 
-This application enables users to create fantasy rugby teams and leagues. Users are therefore able to compete amongst themselves and earn points depending on how players selected perform during the games.
+Fantasy Rugby is a platform that lets users assemble virtual teams from real rugby players, join competitive leagues, and earn points based on how those players perform in live matches — bringing the fantasy sports model to a sport that's largely underserved by existing platforms. This repository contains the backend REST API that powers the app.
 
-#### Development setup
+## Features
 
-- Clone this repo and navigate into the project's directory
+- **User accounts** — registration, login, password reset via email, and profile management
+- **Fantasy teams** — draft real players onto a virtual squad within transfer limits
+- **Leagues** — create, join, or leave private leagues, plus a global public league
+- **Scoring** — points calculated automatically from real player/gameweek performance
+- **Seasons & fixtures** — season, fixture, and gameweek data, with the current gameweek advanced automatically on a schedule
+- **Articles** — rugby news and content served through the API
 
-  - `$ git clone https://github.com/arthuroe/fp && cd fp`
+## Tech Stack
 
-- Create a python3 virtual environment for the project and activate it.
+| Layer      | Technology                      |
+| ---------- | ------------------------------- |
+| Framework  | Flask                           |
+| Database   | PostgreSQL + SQLAlchemy         |
+| Migrations | Alembic (via Flask-Migrate)     |
+| Auth       | JWT (PyJWT) + bcrypt            |
+| Email      | Flask-Mail                      |
+| Scheduling | APScheduler                     |
+| Testing    | pytest, Flask-Testing, coverage |
+| CI         | Travis CI                       |
 
-  - To install the virtual environment wrapper `mkvirtualenv` you can follow [this](https://jamie.curle.io/installing-pip-virtualenv-and-virtualenvwrapper-on-os-x).
-  - `$ mkvirtualenv --py=python3 fp`
+## Project Structure
 
-- Copy `.env.sample` into `.env` in the fp which is the base folder of the project. You should adjust it according to your own local settings.
+The API is organized into resource-based Flask blueprints, each with its own views and models:
 
-- Setup postgresql database
+```
+api/
+├── auth/                     # registration, login, password reset/update
+├── users/                    # user profile management
+├── teams/                    # real-world rugby teams & league standings
+├── players/                  # player data
+├── fixtures/                 # match fixtures
+├── seasons/                  # season data
+├── game_week/                # gameweek data
+├── gameweek_stats/           # per-player/team stats and scoring
+├── fantasy_leagues/          # league creation, join/leave, standings
+├── fantasy_teams/            # fantasy team & squad management
+├── user_fantasy_team_gameweek/  # per-user, per-gameweek fantasy results
+├── articles/                 # news/content
+└── models/                   # SQLAlchemy models
+```
 
-  - `$ create a database`
-  - `$ create user`
+## Getting Started
 
-- Run Migrations for the database
+### Prerequisites
 
-  - `$ python manage.py db init`
-  - `$ python manage.py db migrate`
-  - `$ python manage.py db upgrade`
+- Python 3
+- PostgreSQL
 
-- Install the project's requirements
+### Setup
 
-  - `$ pip install requirements.txt`
+1. **Clone the repo**
 
-- Export the environment variables in the .env
+   ```bash
+   git clone https://github.com/arthuroe/fp.git && cd fp
+   ```
 
-  - `$ export $(cat .env)`
+2. **Create and activate a virtual environment**
 
-- Run tests on the code in the project folder with
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate
+   ```
 
-  - `$ pytest`
+3. **Install dependencies**
 
-- Run the application
-  - `$ python run.py`
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. **Configure environment variables**
+
+   Copy `.env.sample` to `.env` and fill in your local settings (database URL, secret key, mail credentials, etc.):
+
+   ```bash
+   cp .env.sample .env
+   ```
+
+5. **Set up the database**
+
+   Create a PostgreSQL database and user, then point `DATABASE_URL` in `.env` at it. Run migrations:
+
+   ```bash
+   python manage.py db upgrade
+   ```
+
+6. **Run the app**
+
+   ```bash
+   python run.py
+   ```
+
+   The API will be available at `http://localhost:5000/api/v1`.
+
+### Running Tests
+
+```bash
+pytest
+```
+
+## API Overview
+
+All endpoints are prefixed with `/api/v1`. A few highlights:
+
+| Resource             | Example endpoints                                                              |
+| -------------------- | ------------------------------------------------------------------------------ |
+| Auth                 | `POST /auth/register`, `POST /auth/login`, `POST /auth/reset_password`         |
+| Users                | `GET/PUT /current_user`, `GET/PUT/DELETE /users/<user_id>`                     |
+| Fantasy Teams        | `GET/POST /fantasy_teams`, `POST /fantasy_team_players/<fantasy_team_id>`      |
+| Fantasy Leagues      | `POST /join_fantasy_league`, `GET /view_fantasy_leagues`                       |
+| Players              | `GET/POST /players`, `GET/PUT/DELETE /players/<player_id>`                     |
+| Fixtures & Gameweeks | `GET /fixtures`, `GET /current_gameweek`, `GET /gameweek_stats/<game_week_id>` |
+| Articles             | `GET/POST /articles`, `GET /highlight`                                         |
+
+Most write/update endpoints require a valid JWT, passed as `Authorization: Bearer <token>`.

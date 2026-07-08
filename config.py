@@ -16,12 +16,12 @@ class Config:
     SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL")
     SQLALCHEMY_ECHO = False
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    MAIL_SERVER = 'smtp.gmail.com'
-    MAIL_PORT = os.getenv('MAIL_PORT')
+    MAIL_SERVER = os.getenv('MAIL_SERVER', 'smtp-relay.brevo.com')
+    MAIL_PORT = os.getenv('MAIL_PORT', 587)
     MAIL_USERNAME = os.getenv('MAIL_USERNAME')
     MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')
-    MAIL_USE_TLS = False
-    MAIL_USE_SSL = True
+    MAIL_USE_TLS = os.getenv('MAIL_USE_TLS', True)
+    MAIL_USE_SSL = os.getenv('MAIL_USE_SSL', False)
     PAGE_LIMIT = 10
     DEFAULT_PAGE = 1
 
